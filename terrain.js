@@ -41,9 +41,9 @@ function terrain() {
 	terCtx.lineTo(0, points[0]);
     terCtx.fill();
     //draw my name
-	var name = "Guilherme Solski Alves";
+	/*var name = "Guilherme Solski Alves";
 	terCtx.font = "50% Comic Sans MS";
 	terCtx.fillStyle = "white";
-	terCtx.fillText(name, 0, height - height / 4);
+	terCtx.fillText(name, 0, height - height / 4);*/
 }
 
