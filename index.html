@@ -1,27 +1,116 @@
 <!doctype html>
-<html lang="pt">
+<html lang="en">
 
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no" />
-    <meta name="theme-color" content="#000000" />
-    <meta name="Description" content="Portfólio de projetos." />
-    <meta name="Keywords" content="guilherme, java, web, portfolio" />
-    <title>Guilherme Solski Alves</title>
-    <link rel="stylesheet" type="text/css" href="index.css">
-    <script src="jquery-1.9.1.min.js"></script>
-    <script src="starfield.js"></script>
-    <script src="terrain.js"></script>
-    <script src="tree.js"></script>
-    <script src="index.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>document.getElementsByTagName("html")[0].className += " js";</script>
+  <link rel="stylesheet" href="assets/timeline/css/style.css">
+  <link rel="stylesheet" type="text/css" href="assets/Semantic-UI-CSS-master/semantic.min.css">
+  <title>Guilherme Solski Alves</title>
 </head>
 
 <body>
-    <div id="canvas_space">
-        <canvas id="bgCanvas"></canvas>
-        <canvas id="terCanvas"></canvas>
-        <canvas id="treeCanvas"></canvas>
+  <div id="all">
+    <section class="cd-h-timeline js-cd-h-timeline margin-bottom-md">
+      <div class="cd-h-timeline__container container">
+        <div class="cd-h-timeline__dates">
+          <div class="cd-h-timeline__line">
+            <ol>
+              <li><a href="#0" data-date="16/01/2014" class="cd-h-timeline__date cd-h-timeline__date--selected">2015</a>
+              </li>
+              <li><a href="#0" data-date="28/02/2014" class="cd-h-timeline__date">2017</a></li>
+              <li><a href="#0" data-date="20/04/2014" class="cd-h-timeline__date">2018</a></li>
+              <li><a href="#0" data-date="20/05/2014" class="cd-h-timeline__date">2019</a></li>
+              <li><a href="#0" data-date="09/07/2014" class="cd-h-timeline__date">2021</a></li>
+            </ol>
+
+            <span class="cd-h-timeline__filling-line" aria-hidden="true"></span>
+          </div>
+        </div>
+
+        <ul>
+          <li><a href="#0"
+              class="text-replace cd-h-timeline__navigation cd-h-timeline__navigation--prev cd-h-timeline__navigation--inactive">Prev</a>
+          </li>
+          <li><a href="#0" class="text-replace cd-h-timeline__navigation cd-h-timeline__navigation--next">Next</a></li>
+        </ul>
+      </div>
+
+      <div class="cd-h-timeline__events">
+        <ol>
+          <li class="cd-h-timeline__event cd-h-timeline__event--selected text-component">
+            <div class="cd-h-timeline__event-content container">
+              <em class="cd-h-timeline__event-date">February, 2015</em>
+              <p class="cd-h-timeline__event-description color-contrast-medium">
+                I start studying in technical high school, "Instituto Federal do Paraná", where i studied programming
+                the
+                digital games.
+              </p>
+            </div>
+          </li>
+
+          <li class="cd-h-timeline__event text-component">
+            <div class="cd-h-timeline__event-content container">
+              <em class="cd-h-timeline__event-date">December, 2017</em>
+              <p class="cd-h-timeline__event-description color-contrast-medium">
+                Finish my studying in technical high school, developing a game about physiotherapy using Kinect, this
+                for
+                use track movements of patient and compare movements register of physiotherapist in tetermined an
+                session.
+              </p>
+            </div>
+          </li>
+
+          <li class="cd-h-timeline__event text-component">
+            <div class="cd-h-timeline__event-content container">
+              <em class="cd-h-timeline__event-date">February, 2018</em>
+              <p class="cd-h-timeline__event-description color-contrast-medium">
+                I start studying in college, "Pontifícia Universidade Católica do Paraná", where i studying computer
+                science.
+              </p>
+            </div>
+          </li>
+
+          <li class="cd-h-timeline__event text-component">
+            <div class="cd-h-timeline__event-content container">
+              <em class="cd-h-timeline__event-date">February, 2019</em>
+              <p class="cd-h-timeline__event-description color-contrast-medium">
+                I start working in "Banco do Brasil" of intern, where developing and maintain systems web using Java,
+                JavaScript, Html, Css and MySql an database.
+                Now about libraries the systems using Bootstrap and Semantic at part front.
+              </p>
+            </div>
+          </li>
+
+          <li class="cd-h-timeline__event text-component">
+            <div class="cd-h-timeline__event-content container">
+              <em class="cd-h-timeline__event-date">December, 2021</em>
+              <p class="cd-h-timeline__event-description color-contrast-medium">
+                Finish my studying in college.
+              </p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+    <div class="ui raised very container segment">
+
+      <div class="ui black ribbon label">Git <i class="right arrow icon divider"></i> link</div>
+      <p></p>
+      <div class="ui black right  ribbon label">Linkedin <i class="right arrow icon divider"></i> link</div>
+      <p></p>
+      <div class="ui black ribbon label">Curriculum vitae <i class="right arrow icon divider"></i> link</div>
+
+      <button class="ui teal button" id="relax">Relax</button>
     </div>
+  </div>
+  <script src="assets/timeline/js/util.js"></script>
+  <script src="assets/timeline/js/swipe-content.js"></script>
+  <script src="assets/timeline/js/main.js"></script>
+  <script src="assets/jquery-1.9.1.min.js"></script>
+  <script src="assets/Semantic-UI-CSS-master/semantic.min.js"></script>
+  <script src="index.js"></script>
 </body>
 
 </html>
