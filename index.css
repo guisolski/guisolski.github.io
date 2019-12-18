@@ -1,1 +1,4 @@
-
+.scrolling{
+    max-height: 17rem;
+    overflow-y: scroll;
+}
