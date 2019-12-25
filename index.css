@@ -2,3 +2,14 @@
     max-height: 17rem;
     overflow-y: scroll;
 }
+.relax{
+    max-height: 50rem;
+    overflow-y: scroll;
+}
+.centro{
+    margin-left: 45%;
+    margin-right: 45%;
+}
+.gray{
+    color: #999999;
+}
