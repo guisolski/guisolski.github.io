@@ -1,15 +1,16 @@
 function readjustment(){
   
-  var width = $("#all").width();
-  var height = $("#all").height();
-  console.log(width);
-  console.log(height);
+  var width = $(window).width();
+  var height = $(window).height();
+
   if(width > 760 && height > 150){
     $("#addSeg").addClass("segment");
-    $("#addSeg").addClass("relax");
+    $("#addSeg").addClass("scrolling");
+    $("#addSeg").addClass("rem50");
   }else{
     $("#addSeg").removeClass("segment");
-    $("#addSeg").removeClass("relax");
+    $("#addSeg").removeClass("scrolling");
+    $("#addSeg").addClass("rem50");
   }
 }
 readjustment(); 
@@ -22,4 +23,10 @@ $(document).ready(function () {
   window.onresize = function () {
     readjustment(); 
   };
+  $('.overlay')
+  .visibility({
+    type   : 'fixed',
+    offset : 5 // give some space from top of screen
+  })
+;
 });
