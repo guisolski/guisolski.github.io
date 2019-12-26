@@ -1,10 +1,14 @@
 .scrolling{
-    max-height: 17rem;
     overflow-y: scroll;
 }
-.relax{
+.rem17{
+    max-height: 17rem;
+}
+.rem50{
     max-height: 50rem;
-    overflow-y: scroll;
+}
+.rem9{
+    width: 9.5rem !important;
 }
 .centro{
     margin-left: 45%;
@@ -12,4 +16,7 @@
 }
 .gray{
     color: #999999;
+}
+.top{
+    margin-top: 0 !important;
 }
