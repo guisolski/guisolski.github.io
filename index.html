@@ -7,6 +7,8 @@
   <script>document.getElementsByTagName("html")[0].className += " js";</script>
   <link rel="stylesheet" href="assets/timeline/css/style.css">
   <link rel="stylesheet" type="text/css" href="assets/Semantic-UI-CSS-master/semantic.min.css">
+  <link rel="stylesheet" type="text/css" href="assets/Semantic-UI-CSS-master/components/accordion.min.css">
+
   <link rel="stylesheet" type="text/css" href="index.css">
   <link rel="manifest" type="text/css" href="manifest.json">
   <link rel="shortcut icon" href="./assets/images/profile.png">
@@ -22,8 +24,7 @@
             <div class="cd-h-timeline__line">
               <ol>
                 <li><a href="#0" data-date="16/01/2014"
-                    class="cd-h-timeline__date cd-h-timeline__date--selected">2015</a>
-                </li>
+                    class="cd-h-timeline__date cd-h-timeline__date--selected">2015</a></li>
                 <li><a href="#0" data-date="28/02/2014" class="cd-h-timeline__date">2017</a></li>
                 <li><a href="#0" data-date="20/04/2014" class="cd-h-timeline__date">2018</a></li>
                 <li><a href="#0" data-date="20/05/2014" class="cd-h-timeline__date">2019</a></li>
@@ -31,8 +32,8 @@
                 <li><a href="#0" data-date="20/05/2014" class="cd-h-timeline__date">2020</a></li>
                 <li><a href="#0" data-date="20/05/2014" class="cd-h-timeline__date">2021</a></li>
                 <li><a href="#0" data-date="09/07/2014" class="cd-h-timeline__date">2021</a></li>
+                <li><a href="#0" data-date="09/07/2014" class="cd-h-timeline__date">2022</a></li>
               </ol>
-
               <span class="cd-h-timeline__filling-line" aria-hidden="true"></span>
             </div>
           </div>
@@ -95,7 +96,7 @@
               <div class="cd-h-timeline__event-content container">
                 <em class="cd-h-timeline__event-date">March, 2020</em>
                 <p class="cd-h-timeline__event-description color-contrast-medium">
-                  I finish internship in "Banco do Brasil" and Start work in SaaStec, where 
+                  I finish internship in "Banco do Brasil" and Start work in SaaStec, where
                   developing and maintain systems of e-commerce.
                 </p>
               </div>
@@ -112,7 +113,7 @@
               <div class="cd-h-timeline__event-content container">
                 <em class="cd-h-timeline__event-date">July, 2021</em>
                 <p class="cd-h-timeline__event-description color-contrast-medium">
-                 Start Work in ExxonMobil with back-end Programmer.
+                  Start Work in ExxonMobil with back-end Programmer.
                 </p>
               </div>
             </li>
@@ -120,7 +121,15 @@
               <div class="cd-h-timeline__event-content container">
                 <em class="cd-h-timeline__event-date">December, 2021</em>
                 <p class="cd-h-timeline__event-description color-contrast-medium">
-                  Finish my study in college.
+                  Get the bachelor in Computer Science.
+                </p>
+              </div>
+            </li>
+            <li class="cd-h-timeline__event text-component">
+              <div class="cd-h-timeline__event-content container">
+                <em class="cd-h-timeline__event-date">April, 2022</em>
+                <p class="cd-h-timeline__event-description color-contrast-medium">
+                  Start a MBA in Data Science & Analytics
                 </p>
               </div>
             </li>
@@ -131,7 +140,7 @@
     <div class="ui container overlay">
       <div class="ui one column stackable center aligned page grid">
         <div class="column twelve wide">
-          <div class="ui basic center big label">
+          <div class="ui basic center big label" id="relax">
             Guilherme Solski Alves
           </div>
         </div>
@@ -172,7 +181,7 @@
             </div>
           </div>
           <div class="content">
-            <span class="meta">Developer &amp; Enthusiastic Programmer</span>
+            <span class="ui positive basic button" id="aboutMe">About me</span>
           </div>
         </div>
         <div class="ui green card">
@@ -188,32 +197,21 @@
                 </div>
               </div>
               <div class="item">
+                <i class="mail icon"></i>
+                <div class="content">
+                  <a href="mailto:guilhermesolskialves@gmail.com" target="_blank">guigusolski@gmail.com</a>
+                </div>
+              </div>
+              <div class="item">
                 <i class="phone icon"></i>
                 <div class="content">
                   +55 41 996286624
                 </div>
               </div>
-              <div class="item">
-                <i class="facebook square icon"></i>
-                <div class="content">
-                  <a href="https://www.facebook.com/guilherme.solski" target="_blank">Guilherme Solski</a>
-                </div>
-              </div>
-              <div class="item">
-                <i class="instagram icon"></i>
-                <div class="content">
-                  <a href="https://www.instagram.com/guilhermesolski/?hl=pt-br" target="_blank">Guilherme Solski</a>
-                </div>
-              </div>
-              <div class="item">
-                <i class=""></i>
-                <div class="content">
-                </div>
-              </div>
             </div>
           </div>
           <div class="content">
-            <span class="meta">Preferably contact us by email </span>
+            <span class="meta">Contact me by email </span>
           </div>
         </div>
         <div class="ui green card">
@@ -221,30 +219,17 @@
             <div class="header"><i class="book icon"></i>Courses</div>
           </div>
           <div class="content">
-            <div class="ui large divided very relaxed selection list scrolling rem17">
-              <a class="item" href="assets/images/ifpr_certified.jpeg" target="_blank"> Digital Game Developer</a>
-              <a class="item" href="https://cursos.alura.com.br/degree/certificate/be210cc6-27d0-4226-988b-37e8c19310ae"
-                target="_blank">Games With Unity</a>
-              <a class="item" href="https://cursos.alura.com.br/degree/certificate/bd6cc48e-20db-4182-89a6-fbd119e3a5c3"
-                target="_blank">Java</a>
-              <a class="item" href="https://cursos.alura.com.br/degree/certificate/91d915b8-404e-4301-9665-8476b7dac2ef"
-                target="_blank">Java Certification</a>
-              <a class="item" href="https://cursos.alura.com.br/degree/certificate/60bf5be2-6cb3-48d7-ae81-4be03d28ee4b"
-                target="_blank">Java EE</a>
-              <a class="item" href="https://cursos.alura.com.br/career/certificate/0df234d3-00b7-46da-8dfb-10eb60e50021"
-                target="_blank">Starting with SQL and MYSQL</a>
-              <a class="item" href="https://cursos.alura.com.br/degree/certificate/64dab491-9a4e-4e6b-919b-77916dbc0a0d"
-                target="_blank">ORACLE SQL and PL/SQL</a>
-              <a class="item" href="https://cursos.alura.com.br/degree/certificate/6f33345f-e463-4197-882b-3a1b3c95d6be"
-                target="_blank">SQL with Microsoft SQL SERVER 2017</a>
-              <a class="item" href="https://cursos.alura.com.br/degree/certificate/1faf9f6e-534c-4c31-ae52-188d6a347d09"
-                target="_blank">Front-end</a>
-              <a class="item" href="https://cursos.alura.com.br/degree/certificate/f01579e8-1906-4f9d-8bb0-0c4b7761729e"
-                target="_blank">Web accessibility</a>
-              <a class="item" href="https://cursos.alura.com.br/certificate/58c29658-98b4-4074-916e-9756d9af93dc"
-                target="_blank">Eclipse: Productivity</a>
-              <a class="item" href="https://cursos.alura.com.br/certificate/ed023730-03a6-4e8a-b966-ba4bd99f9bc8"
-                target="_blank">Git</a>
+            <div class="ui large divided very relaxed  animated list">
+            </div>
+            <div class="ui divided selection animated list">
+              <div class="item"> <a class="item" href="assets/images/ifpr_certified.jpeg" target="_blank"> Digital Game
+                  Developer</a>
+                <i class="ui green tag label">Technical</i>
+              </div>
+              <div class="item"> <a class="item" href="assets/pdf/faculdade.pdf" target="_blank"> Bachalor Computer
+                  Science</a>
+                <i class="ui blue tag label">Bachalor</i>
+              </div>
             </div>
           </div>
         </div>
@@ -253,50 +238,11 @@
             <div class="header"><i class="terminal icon"></i> Programming Languages</div>
           </div>
           <div class="content">
-            <div class="ui large divided very relaxed  animated list scrolling rem17">
+            <div class="ui large divided very relaxed  animated list  rem17">
               <div class="item">Java</div>
               <div class="item">Python</div>
-              <div class="item">C++</div>
               <div class="item">JavaScript</div>
-              <div class="item">C#</div>
-              <div class="item">Swi-Prolog</div>
               <div class="item">Php</div>
-            </div>
-          </div>
-        </div>
-        <div class="ui green card">
-          <div class="content">
-            <div class="header"><i class="sitemap icon"></i> Auxiliary Tools</div>
-          </div>
-          <div class="content">
-            <div class="ui large divided very relaxed animated list scrolling rem17">
-              <div class="item"> Git </div>
-              <div class="item"> XML </div>
-              <div class="item"> HTML </div>
-              <div class="item"> CSS </div>
-              <div class="item"> SQL </div>
-              <div class="item"> Regex </div>
-              <div class="item"> Json </div>
-              <div class="item"> Ajax </div>
-              <div class="item"> Semantic UI </div>
-              <div class="item"> Bootstrap </div>
-            </div>
-          </div>
-        </div>
-        <div class="ui green card">
-          <div class="content">
-            <div class="header"><i class="edit icon"></i>Development Tools</div>
-          </div>
-          <div class="content">
-            <div class="ui large divided very relaxed animated list scrolling rem17">
-              <div class="item"> Eclipse</div>
-              <div class="item"> Intellij</div>
-              <div class="item"> PyCharm </div>
-              <div class="item"> Visual Studio</div>
-              <div class="item"> Visual Studio Code</div>
-              <div class="item"> Netbeans</div>
-              <div class="item"> Unity</div>
-              <div class="item"> SWI-Prolog</div>
             </div>
           </div>
         </div>
@@ -324,14 +270,6 @@
             </div>
           </div>
         </div>
-        <div class="ui green card">
-          <div class="content">
-            <div class="header"><i class="gamepad icon"></i>Fun Space</div>
-          </div>
-          <div class="content">
-            <button class="ui teal button" id="relax">Relax</button>
-          </div>
-        </div>
       </div>
     </div>
     <script src="assets/pwa.js"></script>
@@ -341,6 +279,18 @@
     <script src="assets/Semantic-UI-CSS-master/semantic.min.js"></script>
     <script src="index.js"></script>
     <script src="assets/timeline/js/main.js"></script>
+    <script src="assets/Semantic-UI-CSS-master/components/accordion.min.js"></script>
+    <div class="ui basic modal">
+      <div class="header">About me</div>
+      <div class="content">
+        <p> I am a software developer with 4-years experience in banking/financial services and energy/oil
+          industries,
+          working currently at ExxonMobil. I've been working with different technologies, mostly Java, Spring and
+          JavaScript, and I'm familiar with practices such as unit testing and Agile methodologies. I have an
+          interest in the following areas: software development, data engineering, internet of things and cloud
+          computing.</p>
+      </div>
+    </div>
 </body>
 
 </html>
