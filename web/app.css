@@ -1,0 +1,563 @@
+/* Guilherme Solski Alves — clean light minimal.
+   Ink is a deep indigo that quietly echoes the #05004c night sky hidden
+   behind the name. Accent is star amber. System fonts only: zero font bytes,
+   zero external requests — the performance budget is part of the design. */
+
+:root {
+  --paper: #ffffff;
+  --ink: #1d1e42;
+  --body-text: #40425f;
+  --muted: #6b6d89;
+  --line: #e6e7f0;
+  --accent: #a86500;
+  --accent-bright: #eda43b;
+  --night: #05004c;
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--paper);
+  color: var(--body-text);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ---- page shell ---- */
+
+.page {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 0 clamp(1.25rem, 5vw, 3rem);
+  transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+.page--leaving {
+  transform: translateX(-6%);
+  opacity: 0;
+}
+
+.intro,
+.timeline,
+.cards,
+.footer {
+  animation: rise 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.timeline { animation-delay: 0.08s; }
+.cards { animation-delay: 0.16s; }
+.footer { animation-delay: 0.24s; }
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+/* ---- intro ---- */
+
+.intro {
+  padding-top: clamp(3rem, 10vh, 6rem);
+}
+
+.intro__avatar {
+  display: block;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  margin-bottom: 1.25rem;
+}
+
+.eyebrow {
+  margin: 0 0 1rem;
+  font: 500 0.8125rem/1.4 var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.intro__name {
+  margin: 0 0 1.5rem;
+  font-size: clamp(2.5rem, 8vw, 4.25rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  color: var(--ink);
+}
+
+.intro__name-button {
+  all: unset;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.intro__name-button::after {
+  content: " ✦";
+  font-size: 0.5em;
+  vertical-align: super;
+  color: var(--accent-bright);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.intro__name-button:hover {
+  color: var(--night);
+}
+
+.intro__name-button:hover::after,
+.intro__name-button:focus-visible::after {
+  opacity: 1;
+}
+
+.intro__about {
+  margin: 0;
+  max-width: 44rem;
+  font-size: 1.0625rem;
+}
+
+/* ---- timeline (the signature) ---- */
+
+.timeline {
+  margin-top: clamp(3rem, 8vh, 5rem);
+}
+
+.timeline:focus-visible {
+  outline-offset: 8px;
+}
+
+.timeline__rail {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.timeline__nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.timeline__nav:hover:enabled {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.timeline__nav:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.timeline__track {
+  flex: 1;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.timeline__track::-webkit-scrollbar {
+  display: none;
+}
+
+.timeline__strip {
+  position: relative;
+  min-width: 100%;
+  width: max-content;
+}
+
+.timeline__line,
+.timeline__fill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 5px;
+  height: 2px;
+  background: var(--line);
+}
+
+.timeline__fill {
+  background: var(--accent-bright);
+  transform-origin: left center;
+  transition: transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.timeline__dates {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.timeline__dates li {
+  flex: 1 1 0;
+  display: flex;
+  justify-content: center;
+  min-width: 3.25rem;
+}
+
+.timeline__date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.4rem 0.5rem 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font: 500 0.8125rem/1 var(--font-mono);
+  color: var(--muted);
+  transition: color 0.2s ease;
+}
+
+.timeline__date::after {
+  content: "";
+  position: relative;
+  z-index: 1;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 2px solid var(--line);
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.timeline__date:hover {
+  color: var(--ink);
+}
+
+.timeline__date:hover::after {
+  border-color: var(--accent-bright);
+}
+
+.timeline__date--passed::after {
+  border-color: var(--accent-bright);
+}
+
+.timeline__date--active {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.timeline__date--active::after {
+  border-color: var(--accent-bright);
+  background: var(--accent-bright);
+  transform: scale(1.2);
+}
+
+.timeline__events {
+  display: grid;
+  margin-top: 2.25rem;
+  min-height: 8.5rem;
+}
+
+.timeline__event {
+  grid-area: 1 / 1;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.timeline__event--selected {
+  opacity: 1;
+  visibility: visible;
+}
+
+.timeline__event--enter-right {
+  animation: slide-in-right 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.timeline__event--enter-left {
+  animation: slide-in-left 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(2.5rem);
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-2.5rem);
+  }
+}
+
+.timeline__event-date {
+  margin: 0 0 0.5rem;
+  font: 600 0.875rem/1.4 var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.timeline__event-body {
+  margin: 0;
+  max-width: 44rem;
+  font-size: 1.0625rem;
+  color: var(--ink);
+}
+
+/* ---- cards ---- */
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 1rem;
+  margin-top: clamp(3rem, 8vh, 5rem);
+}
+
+.card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.card:hover {
+  border-color: #c9cbdd;
+  transform: translateY(-2px);
+}
+
+.card__title {
+  margin: 0 0 1.1rem;
+  font: 600 0.75rem/1.4 var(--font-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.card__note {
+  margin: 0.9rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.links__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--ink);
+  text-decoration: none;
+  transition: color 0.2s ease;
+  overflow-wrap: anywhere;
+}
+
+.links__item .icon {
+  flex-shrink: 0;
+  color: var(--muted);
+  transition: color 0.2s ease;
+}
+
+.links__item:hover {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.links__item:hover .icon {
+  color: var(--accent);
+}
+
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pill {
+  font: 500 0.8125rem/1 var(--font-mono);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.4rem 0.8rem;
+}
+
+.tags {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tags__item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+}
+
+.tags__item:last-child {
+  border-bottom: 0;
+}
+
+.tags__level {
+  font: 500 0.75rem/1.4 var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ---- footer ---- */
+
+.footer {
+  margin-top: clamp(3rem, 8vh, 5rem);
+  padding: 1.5rem 0 2.5rem;
+  border-top: 1px solid var(--line);
+  font: 400 0.8125rem/1.6 var(--font-mono);
+  color: var(--muted);
+}
+
+.footer p {
+  margin: 0;
+}
+
+.footer a {
+  color: inherit;
+  text-underline-offset: 3px;
+}
+
+.footer a:hover {
+  color: var(--accent);
+}
+
+/* ---- relax (the night scene) ---- */
+
+.relax {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: var(--night);
+  animation: night-fall 1s ease both;
+}
+
+@keyframes night-fall {
+  from {
+    opacity: 0;
+  }
+}
+
+.relax__canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.relax__back {
+  position: fixed;
+  top: 1.25rem;
+  left: 1.25rem;
+  z-index: 11;
+  padding: 0.5rem 0.75rem;
+  font: 500 0.875rem/1 var(--font-mono);
+  color: rgba(255, 255, 255, 0.65);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.relax__back:hover {
+  color: #ffffff;
+}
+
+.relax__back:focus-visible {
+  outline-color: #ffffff;
+}
+
+/* ---- wasm loader ----
+   go-app's default loader is a full-screen overlay, which would hide the
+   prerendered page while the wasm downloads. Restyle it into a quiet corner
+   pill: the CV is readable immediately, the pill signals progress until the
+   app becomes interactive. */
+
+.goapp-app-info {
+  position: fixed;
+  top: auto;
+  left: auto;
+  right: 1rem;
+  bottom: 1rem;
+  width: auto;
+  height: auto;
+  flex-direction: row;
+  gap: 0.6rem;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background-color: var(--paper);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  box-shadow: 0 4px 16px rgba(29, 30, 66, 0.08);
+}
+
+@media (prefers-color-scheme: light) {
+  .goapp-app-info {
+    color: var(--muted);
+    background-color: var(--paper);
+  }
+}
+
+.goapp-app-info .goapp-logo {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+}
+
+/* ---- motion preferences ---- */
+
+@media (prefers-reduced-motion: reduce) {
+  .intro,
+  .timeline,
+  .cards,
+  .footer,
+  .timeline__event--enter-right,
+  .timeline__event--enter-left,
+  .relax {
+    animation: none;
+  }
+
+  .page,
+  .timeline__fill,
+  .card {
+    transition: none;
+  }
+}

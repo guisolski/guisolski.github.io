@@ -1,0 +1,66 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Run tests
+        run: go vet ./... && go test ./...
+
+      - name: Build WebAssembly binary
+        run: GOOS=js GOARCH=wasm go build -trimpath -ldflags="-s -w" -o web/app.wasm .
+
+      - name: Optimize WebAssembly binary
+        run: |
+          sudo apt-get update && sudo apt-get install -y binaryen
+          wasm-opt -Oz --enable-bulk-memory --enable-sign-ext \
+            --enable-nontrapping-float-to-int -o web/app.wasm.opt web/app.wasm
+          mv web/app.wasm.opt web/app.wasm
+          ls -lh web/app.wasm
+
+      - name: Generate static site
+        run: go run . -out dist
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+
+      - name: Overlay assets, service-worker killer, and SPA 404
+        run: |
+          cp -r assets dist/assets
+          cp -r static/. dist/
+          cp dist/index.html dist/404.html
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
