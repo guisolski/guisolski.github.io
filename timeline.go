@@ -86,6 +86,25 @@ func (t *Timeline) OnInit() {
 	t.previous = t.selected
 }
 
+// The rail scrolls once it holds more years than fit the page; without this
+// the initially selected (most recent) dot mounts out of view.
+func (t *Timeline) OnMount(ctx app.Context) {
+	ctx.Defer(centerActiveDate)
+}
+
+// dateLabel keeps the label a single flex item — the date button is a flex
+// column, so separate children would stack the star above the year and push
+// the dot off the rail.
+func dateLabel(e TimelineEntry) app.UI {
+	if e.Quote == "" {
+		return app.Text(e.Year)
+	}
+	return app.Span().Body(
+		app.Span().Class("timeline__honor-star").Aria("hidden", "true").Text("✦"),
+		app.Text(e.Year),
+	)
+}
+
 func (t *Timeline) renderDateDot(i int) app.UI {
 	last := lastIndex()
 	return app.Li().Body(
@@ -94,20 +113,25 @@ func (t *Timeline) renderDateDot(i int) app.UI {
 			Style("--year-h", fmt.Sprint(yearHue(i, last))).
 			Aria("label", timelineEntries[i].Date).
 			OnClick(t.selectEvent(i)).
-			Text(timelineEntries[i].Year),
+			Body(dateLabel(timelineEntries[i])),
 	)
 }
 
 func (t *Timeline) renderEventPanel(i int) app.UI {
 	last := lastIndex()
+	e := timelineEntries[i]
+	body := []app.UI{
+		app.H3().Class("timeline__event-date").Text(e.Date),
+		app.P().Class("timeline__event-body").Text(e.Body),
+	}
+	if e.Quote != "" {
+		body = append(body, app.Blockquote().Class("timeline__event-quote").Text(e.Quote))
+	}
 	return app.Article().
 		Class(eventClass(i, t.selected, t.previous)).
 		Style("--year-h", fmt.Sprint(yearHue(i, last))).
 		Aria("hidden", fmt.Sprint(i != t.selected)).
-		Body(
-			app.H3().Class("timeline__event-date").Text(timelineEntries[i].Date),
-			app.P().Class("timeline__event-body").Text(timelineEntries[i].Body),
-		)
+		Body(body...)
 }
 
 func (t *Timeline) renderRail(last int) app.UI {

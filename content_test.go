@@ -47,7 +47,7 @@ func TestTimelineCareerFacts(t *testing.T) {
 	}
 	joined := strings.Join(all, " ")
 
-	for _, fact := range []string{"Mercado Libre", "ExxonMobil", "MBA in Data Science & Analytics"} {
+	for _, fact := range []string{"Mercado Libre", "ExxonMobil", "MBA in Data Science & Analytics", "Recognition Award", "FinkAI"} {
 		if !strings.Contains(joined, fact) {
 			t.Errorf("timeline is missing %q", fact)
 		}

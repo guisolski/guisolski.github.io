@@ -35,7 +35,7 @@ func courseLinksBody() []app.UI {
 func resumeBody() []app.UI {
 	return []app.UI{
 		linkList([]Link{resumeLink}),
-		app.P().Class("card__note").Text("Ask me for an English version by email."),
+		app.P().Class("card__note").Text("Ask me for a Portuguese version by email."),
 	}
 }
 
