@@ -9,12 +9,32 @@ import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
-func main() {
-	app.Route("/", func() app.Composer { return &Home{} })
-	app.Route("/relax", func() app.Composer { return &Relax{} })
-	app.RunWhenOnBrowser()
+type route struct {
+	Path string
+	New  func() app.Composer
+}
 
-	h := &app.Handler{
+var routes = []route{
+	{"/", newHome},
+	{"/relax", newRelax},
+}
+
+func newHome() app.Composer {
+	return &Home{}
+}
+
+func newRelax() app.Composer {
+	return &Relax{}
+}
+
+func registerRoutes() {
+	for _, r := range routes {
+		app.Route(r.Path, r.New)
+	}
+}
+
+func newHandler() *app.Handler {
+	return &app.Handler{
 		Name:            "Guilherme Solski Alves",
 		ShortName:       "Solski",
 		Title:           "Guilherme Solski Alves — Software Developer",
@@ -28,23 +48,44 @@ func main() {
 		Styles:          []string{"/web/app.css"},
 		Version:         os.Getenv("GITHUB_SHA"),
 	}
+}
 
+func parseFlags() (bool, string) {
 	serve := flag.Bool("serve", false, "run local dev server instead of generating the static site")
 	out := flag.String("out", "dist", "output directory for the generated static site")
 	flag.Parse()
+	return *serve, *out
+}
 
-	if *serve {
-		mux := http.NewServeMux()
-		mux.Handle("/assets/", http.FileServer(http.Dir(".")))
-		mux.HandleFunc("/service-worker.js", func(w http.ResponseWriter, r *http.Request) {
-			http.ServeFile(w, r, "static/service-worker.js")
-		})
-		mux.Handle("/", h)
-		log.Println("dev server listening on http://localhost:8000")
-		log.Fatal(http.ListenAndServe(":8000", mux))
+func serveServiceWorker(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "static/service-worker.js")
+}
+
+func newDevMux(h *app.Handler) *http.ServeMux {
+	mux := http.NewServeMux()
+	mux.Handle("/assets/", http.FileServer(http.Dir(".")))
+	mux.HandleFunc("/service-worker.js", serveServiceWorker)
+	mux.Handle("/", h)
+	return mux
+}
+
+func runDevServer(h *app.Handler) error {
+	log.Println("dev server listening on http://localhost:8000")
+	return http.ListenAndServe(":8000", newDevMux(h))
+}
+
+func main() {
+	registerRoutes()
+	app.RunWhenOnBrowser()
+
+	h := newHandler()
+	serve, out := parseFlags()
+
+	if serve {
+		log.Fatal(runDevServer(h))
 	}
 
-	if err := app.GenerateStaticWebsite(*out, h); err != nil {
+	if err := app.GenerateStaticWebsite(out, h); err != nil {
 		log.Fatal(err)
 	}
 }

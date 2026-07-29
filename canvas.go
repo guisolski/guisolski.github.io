@@ -10,8 +10,6 @@ import (
 
 const nightSky = "#05004c"
 
-// ---- starfield ----
-
 type star struct {
 	x, y, size, speed float64
 }
@@ -25,9 +23,6 @@ func newStar(width, height float64, rng *rand.Rand) star {
 	}
 }
 
-// advanceStar returns the star's next state and whether it should be drawn
-// this frame. A star drifts left and respawns at the right edge once it
-// leaves the canvas. Pure: all randomness comes from rng.
 func advanceStar(s star, width, height float64, rng *rand.Rand) (star, bool) {
 	s.x -= s.speed
 	if s.x < 0 {
@@ -55,10 +50,6 @@ func newShootingStar(width float64, now time.Time, rng *rand.Rand) shootingStar 
 	}
 }
 
-// advanceShootingStar returns the shooting star's next state and whether it
-// should be drawn this frame. It waits until its scheduled time, streaks
-// diagonally down-left, and resets once it leaves the canvas. Pure: time and
-// randomness are inputs.
 func advanceShootingStar(s shootingStar, width, height float64, now time.Time, rng *rand.Rand) (shootingStar, bool) {
 	if !s.active {
 		if now.After(s.waitUntil) {
@@ -74,9 +65,6 @@ func advanceShootingStar(s shootingStar, width, height float64, now time.Time, r
 	return s, true
 }
 
-// starfield animates a dense field of drifting stars plus a few shooting
-// stars on a canvas 2D context. Simulation state lives in Go and advances
-// through the pure functions above; only draw calls cross into JavaScript.
 type starfield struct {
 	ctx2d         app.Value
 	rng           *rand.Rand
@@ -98,7 +86,6 @@ func newStarfield(ctx2d app.Value, width, height float64, rng *rand.Rand) *starf
 	return f
 }
 
-// step renders one animation frame.
 func (f *starfield) step() {
 	f.ctx2d.Set("fillStyle", nightSky)
 	f.ctx2d.Call("fillRect", 0, 0, f.width, f.height)
@@ -121,18 +108,17 @@ func (f *starfield) step() {
 			continue
 		}
 		f.ctx2d.Set("lineWidth", next.size)
-		f.ctx2d.Call("beginPath")
-		f.ctx2d.Call("moveTo", next.x, next.y)
-		f.ctx2d.Call("lineTo", next.x+next.length, next.y-next.length)
-		f.ctx2d.Call("stroke")
+		strokeLine(f.ctx2d, next.x, next.y, next.x+next.length, next.y-next.length)
 	}
 }
 
-// ---- terrain ----
+func strokeLine(ctx2d app.Value, x1, y1, x2, y2 float64) {
+	ctx2d.Call("beginPath")
+	ctx2d.Call("moveTo", x1, y1)
+	ctx2d.Call("lineTo", x2, y2)
+	ctx2d.Call("stroke")
+}
 
-// terrainPoints computes a midpoint-displacement mountain profile: index i
-// is the y coordinate at x=i. The profile starts at half height on the left
-// and meets the bottom on the right. Pure: all randomness comes from rng.
 func terrainPoints(width, height float64, rng *rand.Rand) []float64 {
 	displacement := 50.0
 	power := 1 << int(math.Ceil(math.Log2(width)))
@@ -151,7 +137,6 @@ func terrainPoints(width, height float64, rng *rand.Rand) []float64 {
 	return points
 }
 
-// drawTerrain draws the terrain silhouette along the bottom of the canvas.
 func drawTerrain(ctx2d app.Value, width, height float64, rng *rand.Rand) {
 	points := terrainPoints(width, height, rng)
 	ctx2d.Set("fillStyle", "#000000")
@@ -166,23 +151,16 @@ func drawTerrain(ctx2d app.Value, width, height float64, rng *rand.Rand) {
 	ctx2d.Call("fill")
 }
 
-// ---- tree ----
-
-// treeDepth maps the canvas height to a recursion depth, clamped so the
-// branch count stays sane on very short or very tall viewports.
 func treeDepth(height float64) int {
 	return min(max(int(height*0.01), 5), 10)
 }
 
-// branchEnd computes where a branch tip lands, growing from (x, y) at the
-// given angle (degrees) with a length proportional to the remaining depth.
 func branchEnd(x, y, angle float64, depth int, armLength float64) (float64, float64) {
 	rad := angle * math.Pi / 180
 	return x + math.Cos(rad)*float64(depth)*armLength,
 		y + math.Sin(rad)*float64(depth)*armLength
 }
 
-// drawTree draws a recursive fractal tree rooted at (x, y), growing upward.
 func drawTree(ctx2d app.Value, x, y, height float64, rng *rand.Rand) {
 	branch(ctx2d, x, y, -90, treeDepth(height), rng)
 }
@@ -200,16 +178,12 @@ func branch(ctx2d app.Value, x1, y1, angle float64, depth int, rng *rand.Rand) {
 
 	ctx2d.Set("strokeStyle", "#8b4513")
 	ctx2d.Set("lineWidth", float64(depth)*1.5)
-	ctx2d.Call("beginPath")
-	ctx2d.Call("moveTo", x1, y1)
-	ctx2d.Call("lineTo", x2, y2)
-	ctx2d.Call("stroke")
+	strokeLine(ctx2d, x1, y1, x2, y2)
 
 	branch(ctx2d, x2, y2, angle-float64(randInt(rng, 15, 20)), depth-1, rng)
 	branch(ctx2d, x2, y2, angle+float64(randInt(rng, 15, 20)), depth-1, rng)
 }
 
-// randInt returns a uniform random integer in [min, max].
 func randInt(rng *rand.Rand, min, max int) int {
 	return min + rng.Intn(max+1-min)
 }

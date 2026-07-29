@@ -1,10 +1,8 @@
 package main
 
-// TimelineEntry is one event on the career timeline. Entries are kept in
-// chronological order; adding a new milestone is a one-line append.
 type TimelineEntry struct {
-	Year string // label shown on the date rail, may repeat
-	Date string // full display date
+	Year string
+	Date string
 	Body string
 }
 
@@ -72,11 +70,10 @@ const aboutText = "I am a software developer with experience in banking and fina
 	"such as unit testing and Agile methodologies. My interests include software development, " +
 	"data engineering, the Internet of Things, and cloud computing."
 
-// Link is a labeled hyperlink used across the cards.
 type Link struct {
 	Label string
 	Href  string
-	Icon  string // inline SVG id, see cards.go
+	Icon  string
 }
 
 var socialLinks = []Link{
@@ -99,7 +96,6 @@ var courseLinks = []Link{
 
 var resumeLink = Link{Label: "Résumé (Portuguese, PDF)", Href: "/assets/pdf/Curriculum/portugues.pdf", Icon: "file"}
 
-// Tagged is a label with a proficiency/category tag, used for languages.
 type Tagged struct {
 	Label string
 	Tag   string

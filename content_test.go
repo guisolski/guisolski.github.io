@@ -6,8 +6,6 @@ import (
 	"time"
 )
 
-// entryTime parses a display date ("February 2015" or a bare "2023") for
-// ordering checks; bare years sort at the end of that year.
 func entryTime(t *testing.T, date string) time.Time {
 	t.Helper()
 	if parsed, err := time.Parse("January 2006", date); err == nil {
@@ -78,7 +76,6 @@ func TestLinksValid(t *testing.T) {
 					strings.HasPrefix(link.Href, "mailto:"),
 					strings.HasPrefix(link.Href, "tel:"),
 					strings.HasPrefix(link.Href, "/"):
-					// valid
 				default:
 					t.Errorf("unexpected href %q", link.Href)
 				}

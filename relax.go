@@ -7,9 +7,6 @@ import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
-// Relax is the hidden night-scene page: an animated starfield, a fractal
-// mountain silhouette, and a fractal tree, all computed in Go/WebAssembly.
-// The scene layers appear in stages, like the original page did.
 type Relax struct {
 	app.Compo
 
@@ -31,41 +28,49 @@ func (r *Relax) Render() app.UI {
 	)
 }
 
+func (r *Relax) onAnimationFrame(this app.Value, args []app.Value) any {
+	if !r.running {
+		return nil
+	}
+	r.field.step()
+	app.Window().Call("requestAnimationFrame", r.raf)
+	return nil
+}
+
+func (r *Relax) onResize(this app.Value, args []app.Value) any {
+	if r.running {
+		r.setupScene()
+	}
+	return nil
+}
+
+func (r *Relax) revealTerrain(app.Context) {
+	if r.running {
+		r.terrainShown = true
+		r.paintTerrain()
+	}
+}
+
+func (r *Relax) revealTree(app.Context) {
+	if r.running {
+		r.treeShown = true
+		r.paintTree()
+	}
+}
+
 func (r *Relax) OnMount(ctx app.Context) {
 	r.running = true
 	r.rng = rand.New(rand.NewSource(time.Now().UnixNano()))
 	r.setupScene()
 
-	r.raf = app.FuncOf(func(this app.Value, args []app.Value) any {
-		if !r.running {
-			return nil
-		}
-		r.field.step()
-		app.Window().Call("requestAnimationFrame", r.raf)
-		return nil
-	})
+	r.raf = app.FuncOf(r.onAnimationFrame)
 	app.Window().Call("requestAnimationFrame", r.raf)
 
-	r.resize = app.FuncOf(func(this app.Value, args []app.Value) any {
-		if r.running {
-			r.setupScene()
-		}
-		return nil
-	})
+	r.resize = app.FuncOf(r.onResize)
 	app.Window().Call("addEventListener", "resize", r.resize)
 
-	ctx.After(2*time.Second, func(app.Context) {
-		if r.running {
-			r.terrainShown = true
-			r.paintTerrain()
-		}
-	})
-	ctx.After(4500*time.Millisecond, func(app.Context) {
-		if r.running {
-			r.treeShown = true
-			r.paintTree()
-		}
-	})
+	ctx.After(2*time.Second, r.revealTerrain)
+	ctx.After(4500*time.Millisecond, r.revealTree)
 }
 
 func (r *Relax) OnDismount() {
@@ -81,8 +86,6 @@ func (r *Relax) OnDismount() {
 	}
 }
 
-// setupScene sizes all three canvases to the viewport and (re)initializes
-// whatever layers are currently visible.
 func (r *Relax) setupScene() {
 	w, h := app.Window().Size()
 	for _, id := range []string{"bgCanvas", "terCanvas", "treeCanvas"} {
@@ -102,15 +105,19 @@ func (r *Relax) setupScene() {
 	}
 }
 
-func (r *Relax) paintTerrain() {
+func windowSizeF() (float64, float64) {
 	w, h := app.Window().Size()
-	drawTerrain(context2D("terCanvas"), float64(w), float64(h), r.rng)
+	return float64(w), float64(h)
+}
+
+func (r *Relax) paintTerrain() {
+	w, h := windowSizeF()
+	drawTerrain(context2D("terCanvas"), w, h, r.rng)
 }
 
 func (r *Relax) paintTree() {
-	w, h := app.Window().Size()
-	fw, fh := float64(w), float64(h)
-	drawTree(context2D("treeCanvas"), fw-fw/5, fh, fh, r.rng)
+	w, h := windowSizeF()
+	drawTree(context2D("treeCanvas"), w-w/5, h, h, r.rng)
 }
 
 func context2D(canvasID string) app.Value {

@@ -32,7 +32,6 @@ func TestTerrainPoints(t *testing.T) {
 			if points[power] != tc.height {
 				t.Errorf("right edge = %v, want %v", points[power], tc.height)
 			}
-			// Midpoint displacement adds at most 50+30+18+... < 125 total drift.
 			for i, p := range points {
 				if p < 0 || p > tc.height+125 {
 					t.Fatalf("points[%d] = %v out of range [0, %v]", i, p, tc.height+125)
