@@ -34,7 +34,9 @@ func (h *Home) renderIntro() app.UI {
 				Title("Take a break").
 				Aria("label", "Guilherme Solski Alves — open the hidden night scene").
 				OnClick(h.onNameClick).
-				Text("Guilherme Solski Alves"),
+				Body(
+					app.Span().Class("intro__name-text").Text("Guilherme Solski Alves"),
+				),
 		),
 		app.P().Class("intro__about").Text(aboutText),
 	)

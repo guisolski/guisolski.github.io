@@ -2,24 +2,46 @@
    The page hides a night scene (#05004c sky, amber stars) behind the name;
    the day page borrows its spectrum: night indigo → dusk rose → star amber.
    Color is information — the career timeline travels the spectrum from
-   student (indigo, 2015) to today (amber, 2023) — never decoration for its
-   own sake. System fonts only: zero font bytes, zero external requests. */
+   student (indigo, 2015) to today (amber, 2023) — and the surfaces now wear
+   that information: each panel is washed in its own stop of the spectrum.
+   System fonts only: zero font bytes, zero external requests. */
 
 :root {
   --paper: #ffffff;
   --ink: #1d1e42;
   --body-text: #40425f;
-  --muted: #6b6d89;
+  --muted: #616380;
   --line: #e6e7f0;
-  --accent: #a86500;
+  --accent: #8f5700;
   --accent-bright: #eda43b;
   --night: #05004c;
   --dawn-indigo: hsl(245 70% 58%);
   --dawn-rose: hsl(320 65% 55%);
   --dawn-amber: hsl(35 90% 55%);
+  /* deep stops for glyphs — the raw dawn tokens are too light to pass AA
+     as text on white */
+  --dawn-indigo-deep: hsl(245 60% 46%);
+  --dawn-rose-deep: hsl(320 60% 40%);
+  --dawn-amber-deep: hsl(35 95% 36%);
   --dawn-line: linear-gradient(90deg, var(--dawn-indigo), var(--dawn-rose) 55%, var(--dawn-amber));
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+}
+
+/* Registered so the conic avatar ring can rotate. */
+@property --ring-a {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 220deg;
+}
+
+/* Registered so the timeline panel's wash glides across the spectrum when
+   the selected year changes. inherits: true is load-bearing — the nav
+   arrows read the section-level hue. */
+@property --year-h {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 245;
 }
 
 * {
@@ -85,6 +107,36 @@ body {
   }
 }
 
+/* Below the fold, entrances follow the scroll instead of the clock: each
+   card reveals on its own view() timeline, so the cascade comes free from
+   document order. Fenced by @supports — everywhere else the load-time rise
+   above still runs, so nothing can be left invisible. The range completes
+   early (entry 45%) so cards straddling the fold at load are near-opaque. */
+@supports (animation-timeline: view()) {
+  .cards {
+    animation: none;
+  }
+
+  .card {
+    animation: card-reveal ease both;
+    animation-timeline: view(); /* must follow the shorthand — it resets this */
+    animation-range: entry 5% entry 45%;
+  }
+
+  .footer {
+    animation: rise ease both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 60%;
+  }
+}
+
+@keyframes card-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem) scale(0.98);
+  }
+}
+
 /* ---- intro ---- */
 
 .intro {
@@ -92,22 +144,61 @@ body {
   padding-top: clamp(3rem, 10vh, 6rem);
 }
 
-/* A faint aurora behind the intro: the night scene's colors bleeding into
-   the morning page. Kept far below text-contrast territory. */
-.intro::before {
+/* The aurora behind the intro: the night scene's colors bleeding into the
+   morning page. Two layers drifting in counter-phase with mismatched
+   periods, so the sky never reads as a loop. Hotspots stay off the text
+   column; transform/opacity only, so both layers live on the compositor. */
+.intro::before,
+.intro::after {
   content: "";
   position: absolute;
   z-index: -1;
   inset: -6rem -12rem auto;
   height: 26rem;
   pointer-events: none;
-  background:
-    radial-gradient(38rem 20rem at 16% 28%, hsl(245 80% 60% / 0.09), transparent 65%),
-    radial-gradient(30rem 18rem at 78% 10%, hsl(35 90% 58% / 0.11), transparent 65%),
-    radial-gradient(24rem 16rem at 52% 62%, hsl(320 75% 60% / 0.06), transparent 70%);
 }
 
+.intro::before {
+  background:
+    radial-gradient(38rem 20rem at 16% 28%, hsl(245 80% 60% / 0.16), transparent 65%),
+    radial-gradient(30rem 18rem at 78% 10%, hsl(35 90% 58% / 0.2), transparent 65%),
+    radial-gradient(24rem 16rem at 52% 62%, hsl(320 75% 60% / 0.12), transparent 70%);
+  animation: aurora-drift 26s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+.intro::after {
+  background:
+    radial-gradient(30rem 16rem at 34% 12%, hsl(320 75% 60% / 0.1), transparent 65%),
+    radial-gradient(26rem 18rem at 88% 48%, hsl(245 80% 62% / 0.08), transparent 70%);
+  animation: aurora-breathe 19s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+}
+
+@keyframes aurora-drift {
+  from {
+    transform: translate3d(-1.5%, -1%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(1.5%, 2%, 0) scale(1.06);
+  }
+}
+
+@keyframes aurora-breathe {
+  from {
+    opacity: 0.65;
+    transform: translate3d(1%, 1%, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(-1%, -1.5%, 0);
+  }
+}
+
+/* The dawn ring slowly orbits the avatar. Without @property the custom
+   property snaps 220deg → 580deg, a full turn — visually identical. */
 .intro__avatar {
+  --ring-a: 220deg;
   display: block;
   width: 72px;
   height: 72px;
@@ -116,8 +207,15 @@ body {
   border: 2px solid transparent;
   background:
     linear-gradient(var(--paper), var(--paper)) padding-box,
-    conic-gradient(from 220deg, var(--dawn-indigo), var(--dawn-rose), var(--dawn-amber), var(--dawn-indigo)) border-box;
+    conic-gradient(from var(--ring-a), var(--dawn-indigo), var(--dawn-rose), var(--dawn-amber), var(--dawn-indigo)) border-box;
   margin-bottom: 1.25rem;
+  animation: ring-spin 16s linear infinite;
+}
+
+@keyframes ring-spin {
+  to {
+    --ring-a: 580deg;
+  }
 }
 
 .eyebrow {
@@ -139,6 +237,8 @@ body {
 
 .intro__name-button {
   all: unset;
+  display: inline-block; /* inline boxes ignore transforms and fragment the
+                            clipped gradient per line */
   cursor: pointer;
   transition: color 0.3s ease;
 }
@@ -161,6 +261,48 @@ body {
   opacity: 1;
 }
 
+.intro__name-button:active {
+  transform: scale(0.985);
+}
+
+/* The name wears the dawn itself: a slow-panning gradient clipped to the
+   glyphs, deep stops so large-text AA holds. Hovering fades the glyphs to
+   night ink via text-fill-color (a color, so it transitions) — the same
+   "name turns to night + star appears" story as the solid fallback outside
+   this query. The gradient lives on the inner span, not the button: a
+   parent's clipped background paints through every descendant glyph, so
+   putting it on the button would render the hidden ✦ star in gradient ink.
+   First and last stops match, so the 300% pan loops seamlessly. */
+@supports (-webkit-background-clip: text) or (background-clip: text) {
+  .intro__name-text {
+    background-image: linear-gradient(
+      100deg,
+      var(--dawn-indigo-deep),
+      var(--dawn-rose-deep) 30%,
+      var(--dawn-amber-deep) 55%,
+      var(--dawn-rose-deep) 78%,
+      var(--dawn-indigo-deep)
+    );
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: name-drift 22s linear infinite;
+    transition: -webkit-text-fill-color 0.3s ease;
+  }
+
+  .intro__name-button:hover .intro__name-text,
+  .intro__name-button:focus-visible .intro__name-text {
+    -webkit-text-fill-color: var(--night);
+  }
+}
+
+@keyframes name-drift {
+  to {
+    background-position: -300% 0;
+  }
+}
+
 .intro__about {
   margin: 0;
   max-width: 44rem;
@@ -169,8 +311,16 @@ body {
 
 /* ---- timeline (the signature) ---- */
 
+/* The panel is washed in the selected year's stop of the spectrum; with
+   --year-h registered, the wash glides as the years change (and simply
+   snaps where @property is unsupported). */
 .timeline {
   margin-top: clamp(3rem, 8vh, 5rem);
+  padding: clamp(1.25rem, 4vw, 2rem);
+  border-radius: 20px;
+  border: 1px solid hsl(var(--year-h) 45% 91%);
+  background: linear-gradient(135deg, hsl(var(--year-h) 60% 97.5%), hsl(var(--year-h) 35% 99%) 70%);
+  transition: --year-h 0.45s ease;
 }
 
 .timeline:focus-visible {
@@ -195,7 +345,7 @@ body {
   background: var(--paper);
   color: var(--ink);
   cursor: pointer;
-  transition: border-color 0.2s ease, color 0.2s ease;
+  transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 
 /* --year-h is the dawn-spectrum hue: the selected year's hue on the section
@@ -206,9 +356,25 @@ body {
   color: hsl(var(--year-h) 65% 36%);
 }
 
+.timeline__nav:active:enabled {
+  transform: scale(0.92);
+}
+
 .timeline__nav:disabled {
   opacity: 0.35;
   cursor: default;
+}
+
+.timeline__nav svg {
+  transition: transform 0.2s ease;
+}
+
+.timeline__nav--prev:hover:enabled svg {
+  transform: translateX(-2px);
+}
+
+.timeline__nav--next:hover:enabled svg {
+  transform: translateX(2px);
 }
 
 .timeline__track {
@@ -296,6 +462,10 @@ body {
   border-color: var(--year-bright);
 }
 
+.timeline__date:active::after {
+  transform: scale(0.9);
+}
+
 /* Passed dots keep their own year's hue, so the travelled rail reads as the
    dawn spectrum, one small dot at a time. */
 .timeline__date--passed::after {
@@ -307,10 +477,26 @@ body {
   font-weight: 700;
 }
 
+/* The active dot pulses in its own year's hue — a heartbeat on the rail. */
 .timeline__date--active::after {
   border-color: var(--year-bright);
   background: var(--year-bright);
   transform: scale(1.2);
+  animation: dot-pulse 2.8s ease-out infinite;
+}
+
+.timeline__date--active:active::after {
+  transform: scale(1.05);
+}
+
+@keyframes dot-pulse {
+  0% {
+    box-shadow: 0 0 0 0 hsl(var(--year-h) 80% 55% / 0.4);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 9px hsl(var(--year-h) 80% 55% / 0);
+  }
 }
 
 .timeline__events {
@@ -367,6 +553,24 @@ body {
   color: var(--ink);
 }
 
+/* Honors: a small star marks the year on the rail — the night scene's ✦,
+   the same one hiding behind the name. No space before the year: a break
+   opportunity would wrap the label and push the dot off the rail. */
+.timeline__honor-star {
+  color: var(--accent-bright);
+  margin-right: 0.3em;
+}
+
+.timeline__event-quote {
+  margin: 0.9rem 0 0;
+  padding-left: 1rem;
+  border-left: 2px solid hsl(var(--year-h) 60% 62%);
+  max-width: 44rem;
+  font-size: 0.9375rem;
+  font-style: italic;
+  color: var(--body-text);
+}
+
 /* ---- cards ---- */
 
 .cards {
@@ -376,12 +580,23 @@ body {
   margin-top: clamp(3rem, 8vh, 5rem);
 }
 
+/* Each card permanently wears its stop of the spectrum as a whisper-light
+   wash (≥97% lightness where the title sits, so the mono text keeps AA). */
 .card {
   --card-h: 245;
-  border: 1px solid var(--line);
+  border: 1px solid hsl(var(--card-h) 45% 88%);
   border-radius: 12px;
   padding: 1.5rem;
-  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  background: linear-gradient(
+    160deg,
+    hsl(var(--card-h) 70% 97%),
+    hsl(var(--card-h) 55% 98.5%) 55%,
+    var(--paper)
+  );
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* Each card picks a stop on the dawn spectrum, in reading order — the same
@@ -394,9 +609,9 @@ body {
 .card:nth-child(6) { --card-h: 35; }
 
 .card:hover {
-  border-color: hsl(var(--card-h) 55% 78%);
+  border-color: hsl(var(--card-h) 55% 74%);
   box-shadow: 0 12px 32px -16px hsl(var(--card-h) 60% 45% / 0.35);
-  transform: translateY(-2px);
+  transform: translateY(-4px);
 }
 
 .card__title {
@@ -404,7 +619,7 @@ body {
   font: 600 0.75rem/1.4 var(--font-mono);
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: hsl(var(--card-h) 30% 40%);
 }
 
 .card__title::before {
@@ -445,17 +660,29 @@ body {
 .links__item .icon {
   flex-shrink: 0;
   color: hsl(var(--card-h, 245) 55% 48%);
-  transition: color 0.2s ease;
+  transition: color 0.2s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.links__item:hover {
-  color: hsl(var(--card-h, 245) 65% 36%);
-  text-decoration: underline;
-  text-underline-offset: 3px;
+/* The underline draws itself left to right instead of just appearing. */
+.links__item span {
+  background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 0% 1px;
+  transition: background-size 0.25s ease;
 }
 
-.links__item:hover .icon {
+.links__item:hover,
+.links__item:focus-visible {
   color: hsl(var(--card-h, 245) 65% 36%);
+}
+
+.links__item:hover span,
+.links__item:focus-visible span {
+  background-size: 100% 1px;
+}
+
+.links__item:hover .icon,
+.links__item:focus-visible .icon {
+  color: hsl(var(--card-h, 245) 65% 36%);
+  transform: translateX(2px) scale(1.1);
 }
 
 .pills {
@@ -512,8 +739,11 @@ body {
   padding: 1.5rem 0 2.5rem;
   font: 400 0.8125rem/1.6 var(--font-mono);
   color: var(--muted);
+  background: linear-gradient(180deg, transparent, hsl(35 80% 97.5%));
 }
 
+/* A shine sweeps the completed dawn line every few seconds — mostly rest,
+   one glint. The 2px repaint is free. */
 .footer::before {
   content: "";
   position: absolute;
@@ -522,8 +752,22 @@ body {
   right: 0;
   height: 2px;
   border-radius: 999px;
-  background: var(--dawn-line);
-  opacity: 0.75;
+  background:
+    linear-gradient(100deg, transparent 42%, hsl(0 0% 100% / 0.85) 50%, transparent 58%) no-repeat,
+    var(--dawn-line);
+  background-size: 250% 100%, 100% 100%;
+  opacity: 0.85;
+  animation: shimmer-sweep 8s ease-in-out infinite;
+}
+
+@keyframes shimmer-sweep {
+  0%,
+  55% {
+    background-position: 220% 0, 0 0;
+  }
+  100% {
+    background-position: -120% 0, 0 0;
+  }
 }
 
 .footer p {
@@ -620,20 +864,41 @@ body {
 
 /* ---- motion preferences ---- */
 
+/* Everything stops but nothing disappears: still aurora wash, still ring,
+   still gradient name, cards simply visible. This block stays last so it
+   outranks the @supports reveals by source order. */
 @media (prefers-reduced-motion: reduce) {
   .intro,
+  .intro::before,
+  .intro::after,
+  .intro__avatar,
+  .intro__name-button,
   .timeline,
+  .timeline__date--active::after,
   .cards,
+  .card,
   .footer,
+  .footer::before,
   .timeline__event--enter-right,
   .timeline__event--enter-left,
   .relax {
     animation: none;
   }
 
+  .intro__name-text {
+    animation: none;
+  }
+
   .page,
+  .timeline,
   .timeline__fill,
-  .card {
+  .timeline__nav,
+  .timeline__nav svg,
+  .card,
+  .links__item span,
+  .links__item .icon,
+  .intro__name-button,
+  .intro__name-text {
     transition: none;
   }
 
