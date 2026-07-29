@@ -25,8 +25,8 @@ func (h *Home) Render() app.UI {
 				Class("intro__avatar").
 				Src("/assets/images/profile.png").
 				Alt("Portrait of Guilherme Solski Alves").
-				Width(64).
-				Height(64),
+				Width(72).
+				Height(72),
 			app.P().Class("eyebrow").Text("Software developer · Mercado Libre"),
 			app.H1().Class("intro__name").Body(
 				app.Button().

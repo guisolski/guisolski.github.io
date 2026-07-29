@@ -8,6 +8,32 @@ import (
 
 const swipeThreshold = 40 // px of horizontal travel that counts as a swipe
 
+// The timeline is colored as a dawn: the first year sits at night indigo and
+// the hue travels through dusk rose to star amber at the current year — the
+// same night-to-day story as the scene hidden behind the name.
+const (
+	dawnStartHue = 245 // night indigo
+	dawnHueSpan  = 150 // degrees to star amber (35°)
+)
+
+// yearHue maps a timeline index onto the dawn spectrum, in degrees.
+func yearHue(i, last int) int {
+	if last <= 0 {
+		return dawnStartHue
+	}
+	return (dawnStartHue + dawnHueSpan*i/last) % 360
+}
+
+// fillClip reveals the dawn gradient up to the selected year by clipping the
+// remainder of the line from its right edge.
+func fillClip(selected, last int) string {
+	remaining := 100.0
+	if last > 0 {
+		remaining = 100 * (1 - float64(selected)/float64(last))
+	}
+	return fmt.Sprintf("inset(0 %.1f%% 0 0)", remaining)
+}
+
 // swipeStep converts a horizontal touch delta into a timeline step:
 // -1 (swipe right, go back), +1 (swipe left, go forward), or 0.
 func swipeStep(delta float64) int {
@@ -66,15 +92,12 @@ type Timeline struct {
 
 func (t *Timeline) Render() app.UI {
 	last := len(timelineEntries) - 1
-	progress := 0.0
-	if last > 0 {
-		progress = float64(t.selected) / float64(last)
-	}
 
 	return app.Section().
 		Class("timeline").
 		Aria("label", "Career timeline").
 		TabIndex(0).
+		Style("--year-h", fmt.Sprint(yearHue(t.selected, last))).
 		OnKeyDown(t.onKeyDown).
 		Body(
 			app.Div().Class("timeline__rail").Body(
@@ -90,12 +113,13 @@ func (t *Timeline) Render() app.UI {
 						app.Span().
 							Class("timeline__fill").
 							Aria("hidden", "true").
-							Style("transform", fmt.Sprintf("scaleX(%.4f)", progress)),
+							Style("clip-path", fillClip(t.selected, last)),
 						app.Ol().Class("timeline__dates").Body(
 							app.Range(timelineEntries).Slice(func(i int) app.UI {
 								return app.Li().Body(
 									app.Button().
 										Class(dateClass(i, t.selected)).
+										Style("--year-h", fmt.Sprint(yearHue(i, last))).
 										Aria("label", timelineEntries[i].Date).
 										OnClick(t.selectEvent(i)).
 										Text(timelineEntries[i].Year),
@@ -119,6 +143,7 @@ func (t *Timeline) Render() app.UI {
 					app.Range(timelineEntries).Slice(func(i int) app.UI {
 						return app.Article().
 							Class(eventClass(i, t.selected, t.previous)).
+							Style("--year-h", fmt.Sprint(yearHue(i, last))).
 							Aria("hidden", fmt.Sprint(i != t.selected)).
 							Body(
 								app.H3().Class("timeline__event-date").Text(timelineEntries[i].Date),
@@ -131,14 +156,21 @@ func (t *Timeline) Render() app.UI {
 
 func (t *Timeline) selectEvent(i int) app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
-		t.moveTo(i)
+		t.move(ctx, i)
 	}
 }
 
 func (t *Timeline) shiftBy(delta int) app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
-		t.moveTo(t.selected + delta)
+		t.move(ctx, t.selected+delta)
 	}
+}
+
+// move applies the state change and, after the update, keeps the newly
+// selected year visible when the rail overflows on narrow screens.
+func (t *Timeline) move(ctx app.Context, i int) {
+	t.moveTo(i)
+	ctx.Defer(centerActiveDate)
 }
 
 func (t *Timeline) moveTo(i int) {
@@ -149,14 +181,21 @@ func (t *Timeline) moveTo(i int) {
 	t.selected = i
 }
 
+func centerActiveDate(ctx app.Context) {
+	active := app.Window().Get("document").Call("querySelector", ".timeline__date--active")
+	if active.Truthy() {
+		active.Call("scrollIntoView", map[string]any{"block": "nearest", "inline": "center"})
+	}
+}
+
 func (t *Timeline) onKeyDown(ctx app.Context, e app.Event) {
 	switch e.Get("key").String() {
 	case "ArrowLeft":
 		e.PreventDefault()
-		t.moveTo(t.selected - 1)
+		t.move(ctx, t.selected-1)
 	case "ArrowRight":
 		e.PreventDefault()
-		t.moveTo(t.selected + 1)
+		t.move(ctx, t.selected+1)
 	}
 }
 
@@ -174,6 +213,6 @@ func (t *Timeline) onTouchEnd(ctx app.Context, e app.Event) {
 	}
 	delta := touches.Index(0).Get("clientX").Float() - t.touchX
 	if step := swipeStep(delta); step != 0 {
-		t.moveTo(t.selected + step)
+		t.move(ctx, t.selected+step)
 	}
 }

@@ -1,7 +1,9 @@
-/* Guilherme Solski Alves — clean light minimal.
-   Ink is a deep indigo that quietly echoes the #05004c night sky hidden
-   behind the name. Accent is star amber. System fonts only: zero font bytes,
-   zero external requests — the performance budget is part of the design. */
+/* Guilherme Solski Alves — clean light minimal, colored as a dawn.
+   The page hides a night scene (#05004c sky, amber stars) behind the name;
+   the day page borrows its spectrum: night indigo → dusk rose → star amber.
+   Color is information — the career timeline travels the spectrum from
+   student (indigo, 2015) to today (amber, 2023) — never decoration for its
+   own sake. System fonts only: zero font bytes, zero external requests. */
 
 :root {
   --paper: #ffffff;
@@ -12,6 +14,10 @@
   --accent: #a86500;
   --accent-bright: #eda43b;
   --night: #05004c;
+  --dawn-indigo: hsl(245 70% 58%);
+  --dawn-rose: hsl(320 65% 55%);
+  --dawn-amber: hsl(35 90% 55%);
+  --dawn-line: linear-gradient(90deg, var(--dawn-indigo), var(--dawn-rose) 55%, var(--dawn-amber));
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
 }
@@ -27,6 +33,7 @@ html {
 body {
   margin: 0;
   min-height: 100%;
+  overflow-x: clip; /* the intro aurora bleeds past the page column */
   background: var(--paper);
   color: var(--body-text);
   font-family: var(--font-sans);
@@ -34,6 +41,10 @@ body {
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: hsl(35 90% 60% / 0.3);
 }
 
 :focus-visible {
@@ -77,15 +88,35 @@ body {
 /* ---- intro ---- */
 
 .intro {
+  position: relative;
   padding-top: clamp(3rem, 10vh, 6rem);
+}
+
+/* A faint aurora behind the intro: the night scene's colors bleeding into
+   the morning page. Kept far below text-contrast territory. */
+.intro::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -6rem -12rem auto;
+  height: 26rem;
+  pointer-events: none;
+  background:
+    radial-gradient(38rem 20rem at 16% 28%, hsl(245 80% 60% / 0.09), transparent 65%),
+    radial-gradient(30rem 18rem at 78% 10%, hsl(35 90% 58% / 0.11), transparent 65%),
+    radial-gradient(24rem 16rem at 52% 62%, hsl(320 75% 60% / 0.06), transparent 70%);
 }
 
 .intro__avatar {
   display: block;
-  width: 64px;
-  height: 64px;
+  width: 72px;
+  height: 72px;
+  padding: 3px;
   border-radius: 50%;
-  border: 1px solid var(--line);
+  border: 2px solid transparent;
+  background:
+    linear-gradient(var(--paper), var(--paper)) padding-box,
+    conic-gradient(from 220deg, var(--dawn-indigo), var(--dawn-rose), var(--dawn-amber), var(--dawn-indigo)) border-box;
   margin-bottom: 1.25rem;
 }
 
@@ -167,9 +198,12 @@ body {
   transition: border-color 0.2s ease, color 0.2s ease;
 }
 
+/* --year-h is the dawn-spectrum hue: the selected year's hue on the section
+   root (so the nav arrows warm up as the career advances), each year's own
+   hue on its dot and event panel. */
 .timeline__nav:hover:enabled {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: hsl(var(--year-h) 60% 55%);
+  color: hsl(var(--year-h) 65% 36%);
 }
 
 .timeline__nav:disabled {
@@ -180,6 +214,7 @@ body {
 .timeline__track {
   flex: 1;
   overflow-x: auto;
+  scroll-behavior: smooth;
   scrollbar-width: none;
 }
 
@@ -203,10 +238,12 @@ body {
   background: var(--line);
 }
 
+/* The signature: advancing through the years reveals the dawn gradient,
+   clipped from the right edge (clip-path keeps the colors in place where a
+   scaleX would squash them). */
 .timeline__fill {
-  background: var(--accent-bright);
-  transform-origin: left center;
-  transition: transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
+  background: var(--dawn-line);
+  transition: clip-path 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
 .timeline__dates {
@@ -224,6 +261,8 @@ body {
 }
 
 .timeline__date {
+  --year: hsl(var(--year-h) 65% 36%);
+  --year-bright: hsl(var(--year-h) 75% 55%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -250,25 +289,27 @@ body {
 }
 
 .timeline__date:hover {
-  color: var(--ink);
+  color: var(--year);
 }
 
 .timeline__date:hover::after {
-  border-color: var(--accent-bright);
+  border-color: var(--year-bright);
 }
 
+/* Passed dots keep their own year's hue, so the travelled rail reads as the
+   dawn spectrum, one small dot at a time. */
 .timeline__date--passed::after {
-  border-color: var(--accent-bright);
+  border-color: var(--year-bright);
 }
 
 .timeline__date--active {
-  color: var(--ink);
+  color: var(--year);
   font-weight: 700;
 }
 
 .timeline__date--active::after {
-  border-color: var(--accent-bright);
-  background: var(--accent-bright);
+  border-color: var(--year-bright);
+  background: var(--year-bright);
   transform: scale(1.2);
 }
 
@@ -316,7 +357,7 @@ body {
   font: 600 0.875rem/1.4 var(--font-mono);
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: hsl(var(--year-h) 65% 36%);
 }
 
 .timeline__event-body {
@@ -336,14 +377,25 @@ body {
 }
 
 .card {
+  --card-h: 245;
   border: 1px solid var(--line);
   border-radius: 12px;
   padding: 1.5rem;
-  transition: border-color 0.2s ease, transform 0.2s ease;
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+/* Each card picks a stop on the dawn spectrum, in reading order — the same
+   left-to-right hue travel as the timeline above. */
+.card:nth-child(1) { --card-h: 245; }
+.card:nth-child(2) { --card-h: 275; }
+.card:nth-child(3) { --card-h: 305; }
+.card:nth-child(4) { --card-h: 335; }
+.card:nth-child(5) { --card-h: 5; }
+.card:nth-child(6) { --card-h: 35; }
+
 .card:hover {
-  border-color: #c9cbdd;
+  border-color: hsl(var(--card-h) 55% 78%);
+  box-shadow: 0 12px 32px -16px hsl(var(--card-h) 60% 45% / 0.35);
   transform: translateY(-2px);
 }
 
@@ -353,6 +405,16 @@ body {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--muted);
+}
+
+.card__title::before {
+  content: "";
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-right: 0.55rem;
+  border-radius: 50%;
+  background: hsl(var(--card-h) 70% 55%);
 }
 
 .card__note {
@@ -382,18 +444,18 @@ body {
 
 .links__item .icon {
   flex-shrink: 0;
-  color: var(--muted);
+  color: hsl(var(--card-h, 245) 55% 48%);
   transition: color 0.2s ease;
 }
 
 .links__item:hover {
-  color: var(--accent);
+  color: hsl(var(--card-h, 245) 65% 36%);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
 .links__item:hover .icon {
-  color: var(--accent);
+  color: hsl(var(--card-h, 245) 65% 36%);
 }
 
 .pills {
@@ -442,12 +504,26 @@ body {
 
 /* ---- footer ---- */
 
+/* The footer's top rule is the fully revealed dawn line — the timeline's
+   gradient, completed, closing the page. */
 .footer {
+  position: relative;
   margin-top: clamp(3rem, 8vh, 5rem);
   padding: 1.5rem 0 2.5rem;
-  border-top: 1px solid var(--line);
   font: 400 0.8125rem/1.6 var(--font-mono);
   color: var(--muted);
+}
+
+.footer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--dawn-line);
+  opacity: 0.75;
 }
 
 .footer p {
@@ -559,5 +635,9 @@ body {
   .timeline__fill,
   .card {
     transition: none;
+  }
+
+  .timeline__track {
+    scroll-behavior: auto;
   }
 }

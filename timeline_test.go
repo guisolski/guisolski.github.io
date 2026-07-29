@@ -31,6 +31,51 @@ func TestMoveTo(t *testing.T) {
 	}
 }
 
+func TestYearHue(t *testing.T) {
+	tests := []struct {
+		name string
+		i    int
+		last int
+		want int
+	}{
+		{name: "first year is night indigo", i: 0, last: 10, want: 245},
+		{name: "midpoint is dusk rose", i: 5, last: 10, want: 320},
+		{name: "last year is star amber", i: 10, last: 10, want: 35},
+		{name: "interior hue is interpolated", i: 3, last: 10, want: 290},
+		{name: "single entry stays at the start", i: 0, last: 0, want: 245},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if got := yearHue(tc.i, tc.last); got != tc.want {
+				t.Errorf("yearHue(%d, %d) = %d, want %d", tc.i, tc.last, got, tc.want)
+			}
+		})
+	}
+}
+
+func TestFillClip(t *testing.T) {
+	tests := []struct {
+		name     string
+		selected int
+		last     int
+		want     string
+	}{
+		{name: "start hides the whole line", selected: 0, last: 10, want: "inset(0 100.0% 0 0)"},
+		{name: "midpoint reveals half", selected: 5, last: 10, want: "inset(0 50.0% 0 0)"},
+		{name: "end reveals everything", selected: 10, last: 10, want: "inset(0 0.0% 0 0)"},
+		{name: "single entry hides the line", selected: 0, last: 0, want: "inset(0 100.0% 0 0)"},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if got := fillClip(tc.selected, tc.last); got != tc.want {
+				t.Errorf("fillClip(%d, %d) = %q, want %q", tc.selected, tc.last, got, tc.want)
+			}
+		})
+	}
+}
+
 func TestSwipeStep(t *testing.T) {
 	tests := []struct {
 		name  string
