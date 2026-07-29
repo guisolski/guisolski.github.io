@@ -90,6 +90,14 @@ type Timeline struct {
 	touchX   float64 // clientX where the current touch started
 }
 
+// OnInit opens the timeline on the most recent year, so the current role
+// reads first and the dawn line arrives fully revealed. Runs before the
+// first render on both prerender and browser.
+func (t *Timeline) OnInit() {
+	t.selected = len(timelineEntries) - 1
+	t.previous = t.selected
+}
+
 func (t *Timeline) Render() app.UI {
 	last := len(timelineEntries) - 1
 

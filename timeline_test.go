@@ -31,6 +31,14 @@ func TestMoveTo(t *testing.T) {
 	}
 }
 
+func TestOnInitSelectsMostRecentYear(t *testing.T) {
+	tl := &Timeline{}
+	tl.OnInit()
+	if want := len(timelineEntries) - 1; tl.selected != want || tl.previous != want {
+		t.Errorf("OnInit() = (selected %d, previous %d), want both %d", tl.selected, tl.previous, want)
+	}
+}
+
 func TestYearHue(t *testing.T) {
 	tests := []struct {
 		name string
