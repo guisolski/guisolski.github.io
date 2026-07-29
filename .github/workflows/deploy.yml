@@ -43,8 +43,9 @@ jobs:
         env:
           GITHUB_SHA: ${{ github.sha }}
 
-      - name: Overlay assets, service-worker killer, and SPA 404
+      - name: Overlay web resources, assets, service-worker killer, and SPA 404
         run: |
+          cp -r web/. dist/web/
           cp -r assets dist/assets
           cp -r static/. dist/
           cp dist/index.html dist/404.html

@@ -10,16 +10,10 @@ cards, and a hidden canvas night scene) runs as a Go program in the browser.
 ## Development
 
 ```sh
-GOOS=js GOARCH=wasm go build -o web/app.wasm .   # build the browser binary
-go run . -serve                                   # dev server on :8000
-```
-
-## Build the static site
-
-```sh
-GOOS=js GOARCH=wasm go build -trimpath -ldflags="-s -w" -o web/app.wasm .
-go run . -out dist
-cp -r assets dist/assets && cp -r static/. dist/
+make help    # list all targets
+make serve   # build wasm + dev server on :8000
+make test    # go vet + table-driven test suite
+make dist    # production static site in dist/
 ```
 
 Deployment is automated: every push to `master` runs
