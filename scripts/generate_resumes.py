@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-"""Generate ATS-friendly EN/PT résumés for guisolski.github.io.
+"""Generate ATS-friendly PT currículo PDF for guisolski.github.io.
 
-Uses only verified career facts from the personal site / CVs.
+The English CV is maintained as a moderncv PDF at assets/pdf/cv.pdf (with
+assets/pdf/resume.pdf kept as an identical copy for old bookmarks). Do not
+overwrite those files with reportlab output.
 """
 
 from pathlib import Path
@@ -12,7 +14,6 @@ from reportlab.lib.units import inch
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
 
 ROOT = Path(__file__).resolve().parents[1]
-EN_OUT = ROOT / "assets/pdf/resume.pdf"
 PT_OUT = ROOT / "assets/pdf/Curriculum/portugues.pdf"
 
 
@@ -83,90 +84,6 @@ def styles():
 
 def bullet(text, s):
     return Paragraph(f"• {text}", s["bullet"])
-
-
-def build_en(path: Path):
-    s = styles()
-    doc = SimpleDocTemplate(
-        str(path),
-        pagesize=letter,
-        leftMargin=0.7 * inch,
-        rightMargin=0.7 * inch,
-        topMargin=0.55 * inch,
-        bottomMargin=0.55 * inch,
-        title="Guilherme Solski Alves — Résumé",
-        author="Guilherme Solski Alves",
-    )
-    story = [
-        Paragraph("Guilherme Solski Alves", s["name"]),
-        Paragraph(
-            "Curitiba, Paraná, Brazil — Open to remote and relocation<br/>"
-            "+55 41 99628-6624 · guilhermesolskialves@gmail.com<br/>"
-            "LinkedIn: linkedin.com/in/guilherme-solski-alves · "
-            "GitHub: github.com/guisolski · Site: guisolski.github.io",
-            s["contact"],
-        ),
-        Paragraph("Summary", s["section"]),
-        Paragraph(
-            "Backend engineer with 7+ years in production systems. Currently writing Go at "
-            "Mercado Libre for e-commerce platforms serving 1M+ customers, with end-to-end "
-            "ownership of observability (OpenTelemetry; New Relic, Grafana, Datadog, Kibana). "
-            "Part-time co-founder of FINK AI. Open to full-time backend roles (remote or relocation).",
-            s["body"],
-        ),
-        Paragraph("Experience", s["section"]),
-        Paragraph("Mercado Libre — Software Engineer (Go)", s["job"]),
-        Paragraph("Oct 2022 – Present · E-commerce platforms", s["meta"]),
-        bullet(
-            "Write Go for scalable services serving 1M+ customers; use goroutines and "
-            "in-memory caching where appropriate.",
-            s,
-        ),
-        bullet(
-            "Own the observability chain end to end: application metrics, OpenTelemetry "
-            "instrumentation, and operational dashboards and alerts across New Relic, Grafana, "
-            "Datadog, and Kibana.",
-            s,
-        ),
-        Paragraph("FINK AI — Co-Founder (part-time)", s["job"]),
-        Paragraph("May 2025 – Present · Alongside full-time employment", s["meta"]),
-        bullet(
-            "Personal-finance product with 20,000+ registered users and 4.2M+ financial records; "
-            "Open Finance.",
-            s,
-        ),
-        Paragraph("ExxonMobil — Java Developer", s["job"]),
-        Paragraph("Jul 2021 – Oct 2022", s["meta"]),
-        bullet("Azure with Terraform; Confluent Cloud Kafka + Avro.", s),
-        bullet(
-            "MSP transition program; Leadership Recognition Award (2022).",
-            s,
-        ),
-        Paragraph("Composable Bit — Java Developer", s["job"]),
-        Paragraph("May 2021 – Jul 2021 · Self-employed", s["meta"]),
-        Paragraph("Go44 — Ruby Developer (part-time)", s["job"]),
-        Paragraph("Oct 2020 – 2021 · Industry 4.0 systems", s["meta"]),
-        Paragraph("SaaSTec Labs — PHP Developer / Intern", s["job"]),
-        Paragraph("Mar 2020 – 2021 · E-commerce systems", s["meta"]),
-        Paragraph("Banco do Brasil — Intern (Java)", s["job"]),
-        Paragraph("Jan 2019 – Mar 2020 · Web systems (Java, JavaScript, MySQL)", s["meta"]),
-        Paragraph("Education", s["section"]),
-        bullet("MBA, Data Science & Analytics — USP / ESALQ, 2022–2024", s),
-        bullet("Bachelor of Computer Science — PUCPR, 2018–2021", s),
-        bullet("Digital Game Developer (technical) — IFPR, 2015–2017", s),
-        Paragraph("Languages", s["section"]),
-        Paragraph(
-            "Portuguese — Native · English — Full professional · Spanish — Professional working",
-            s["body"],
-        ),
-        Paragraph("Technical skills", s["section"]),
-        Paragraph(
-            "Go, Java, Python, SQL, JavaScript · OpenTelemetry · New Relic, Grafana, Datadog, "
-            "Kibana · Azure, Terraform · Kafka / Avro · Caching, concurrent services",
-            s["body"],
-        ),
-    ]
-    doc.build(story)
 
 
 def build_pt(path: Path):
@@ -255,12 +172,10 @@ def build_pt(path: Path):
 
 
 def main():
-    EN_OUT.parent.mkdir(parents=True, exist_ok=True)
     PT_OUT.parent.mkdir(parents=True, exist_ok=True)
-    build_en(EN_OUT)
     build_pt(PT_OUT)
-    print(f"wrote {EN_OUT} ({EN_OUT.stat().st_size} bytes)")
     print(f"wrote {PT_OUT} ({PT_OUT.stat().st_size} bytes)")
+    print("English CV: use assets/pdf/cv.pdf (moderncv); do not overwrite with reportlab")
 
 
 if __name__ == "__main__":

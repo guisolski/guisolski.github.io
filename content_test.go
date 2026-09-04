@@ -210,15 +210,18 @@ func TestEducationIncludesMBA(t *testing.T) {
 
 func TestResumeLinks(t *testing.T) {
 	if len(resumeLinks) < 2 {
-		t.Fatalf("expected English and Portuguese résumé links, got %d", len(resumeLinks))
+		t.Fatalf("expected English and Portuguese CV links, got %d", len(resumeLinks))
 	}
-	if resumeLinks[0].Href != "/assets/pdf/resume.pdf" {
-		t.Errorf("English résumé href = %q", resumeLinks[0].Href)
+	if resumeLinks[0].Href != "/assets/pdf/cv.pdf" {
+		t.Errorf("English CV href = %q", resumeLinks[0].Href)
+	}
+	if resumeLinks[0].Label != "CV (English, PDF)" {
+		t.Errorf("English CV label = %q", resumeLinks[0].Label)
 	}
 	if resumeLinks[1].Href != "/assets/pdf/Curriculum/portugues.pdf" {
-		t.Errorf("Portuguese résumé href = %q", resumeLinks[1].Href)
+		t.Errorf("Portuguese CV href = %q", resumeLinks[1].Href)
 	}
 	if resumeLink.Href != resumeLinks[0].Href {
-		t.Errorf("resumeLink should alias the English résumé")
+		t.Errorf("resumeLink should alias the English CV")
 	}
 }

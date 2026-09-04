@@ -17,7 +17,7 @@ var cardSpecs = []cardSpec{
 	{"Education", courseLinksBody},
 	{"Programming languages", programmingLanguagesBody},
 	{"Languages", spokenLanguagesBody},
-	{"Résumé", resumeBody},
+	{"CV", resumeBody},
 }
 
 func socialLinksBody() []app.UI {

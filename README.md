@@ -7,6 +7,10 @@ Written in **Go**, compiled to **WebAssembly** with
 frameworks, no external requests: the whole UI (reactive career timeline,
 cards, and a hidden canvas night scene) runs as a Go program in the browser.
 
+English CV download: [`assets/pdf/cv.pdf`](assets/pdf/cv.pdf) (moderncv).
+`assets/pdf/resume.pdf` is kept as an identical copy so older bookmarks still
+resolve. Portuguese: [`assets/pdf/Curriculum/portugues.pdf`](assets/pdf/Curriculum/portugues.pdf).
+
 ## Development
 
 ```sh
