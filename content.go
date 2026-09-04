@@ -81,7 +81,8 @@ var timelineEntries = []TimelineEntry{
 	{
 		Year: "2022",
 		Date: "October 2022",
-		Body: "Moved from ExxonMobil to Mercado Libre as a software engineer.",
+		Body: "Joined Mercado Libre as a software engineer writing Go for e-commerce platforms " +
+			"serving 1M+ customers, owning scalable services and the observability chain end to end.",
 	},
 	{
 		Year: "2023",
@@ -91,15 +92,18 @@ var timelineEntries = []TimelineEntry{
 	{
 		Year: "2025",
 		Date: "May 2025",
-		Body: "Co-founded FinkAI, working part-time on start-up leadership and software infrastructure.",
+		Body: "Co-founded FINK AI part-time alongside full-time employment — a personal-finance " +
+			"product with 20,000+ registered users and 4.2M+ financial records.",
 	},
 }
 
-const aboutText = "I am a software developer with experience in banking and financial services, " +
-	"energy, and e-commerce, currently working at Mercado Libre. I have worked with a range of " +
-	"technologies — mostly Java, Spring, and JavaScript — and I am comfortable with practices " +
-	"such as unit testing and Agile methodologies. My interests include software development, " +
-	"data engineering, the Internet of Things, and cloud computing."
+const aboutText = "Backend engineer with 7+ years in production systems. At Mercado Libre I write Go " +
+	"for e-commerce platforms serving 1M+ customers and own observability end to end — metrics, " +
+	"OpenTelemetry, and dashboards and alerts across New Relic, Grafana, Datadog, and Kibana. " +
+	"Previously at ExxonMobil: Azure with Terraform, Confluent Cloud Kafka + Avro, and an MSP " +
+	"transition (Leadership Recognition Award, 2022). Part-time co-founder of FINK AI since 2025 — " +
+	"personal finance with 20,000+ users and 4.2M+ financial records. Open to full-time backend " +
+	"roles (remote or relocation)."
 
 type Link struct {
 	Label string
@@ -109,7 +113,7 @@ type Link struct {
 
 var socialLinks = []Link{
 	{Label: "GitHub", Href: "https://github.com/guisolski", Icon: "github"},
-	{Label: "LinkedIn", Href: "https://www.linkedin.com/in/guilherme-solski-alves-566262160/", Icon: "linkedin"},
+	{Label: "LinkedIn", Href: "https://www.linkedin.com/in/guilherme-solski-alves/", Icon: "linkedin"},
 	{Label: "HackerRank", Href: "https://www.hackerrank.com/guilhermesolski", Icon: "code"},
 	{Label: "URI Online Judge", Href: "https://www.urionlinejudge.com.br/judge/en/profile/296338", Icon: "trophy"},
 }
@@ -131,10 +135,10 @@ type Tagged struct {
 	Tag   string
 }
 
-var programmingLanguages = []string{"Java", "Python", "JavaScript", "PHP", "Go"}
+var programmingLanguages = []string{"Go", "Java", "Python", "SQL", "JavaScript"}
 
 var spokenLanguages = []Tagged{
 	{Label: "Portuguese", Tag: "Native"},
-	{Label: "English", Tag: "Advanced"},
-	{Label: "Spanish", Tag: "Intermediate"},
+	{Label: "English", Tag: "Full professional"},
+	{Label: "Spanish", Tag: "Professional working"},
 }

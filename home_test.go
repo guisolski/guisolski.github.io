@@ -19,3 +19,10 @@ func TestPageClass(t *testing.T) {
 		})
 	}
 }
+
+func TestIntroEyebrow(t *testing.T) {
+	const want = "Backend software engineer · Go · Mercado Libre"
+	if introEyebrow != want {
+		t.Errorf("introEyebrow = %q, want %q", introEyebrow, want)
+	}
+}

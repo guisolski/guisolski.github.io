@@ -47,13 +47,113 @@ func TestTimelineCareerFacts(t *testing.T) {
 	}
 	joined := strings.Join(all, " ")
 
-	for _, fact := range []string{"Mercado Libre", "ExxonMobil", "MBA in Data Science & Analytics", "Recognition Award", "FinkAI"} {
+	for _, fact := range []string{"Mercado Libre", "ExxonMobil", "MBA in Data Science & Analytics", "Recognition Award", "FINK AI"} {
 		if !strings.Contains(joined, fact) {
 			t.Errorf("timeline is missing %q", fact)
 		}
 	}
 	if !strings.Contains(aboutText, "Mercado Libre") {
 		t.Errorf("about text should mention the current employer, Mercado Libre")
+	}
+}
+
+func TestAboutTextPositioning(t *testing.T) {
+	for _, fact := range []string{
+		"Backend engineer",
+		"7+ years",
+		"Mercado Libre",
+		"Go",
+		"1M+ customers",
+		"OpenTelemetry",
+		"ExxonMobil",
+		"FINK AI",
+		"20,000+",
+		"4.2M+",
+	} {
+		if !strings.Contains(aboutText, fact) {
+			t.Errorf("about text is missing %q", fact)
+		}
+	}
+	for _, old := range []string{"Internet of Things", "data engineering", "Agile methodologies"} {
+		if strings.Contains(aboutText, old) {
+			t.Errorf("about text still contains outdated interest phrasing %q", old)
+		}
+	}
+}
+
+func TestProgrammingLanguagesOrder(t *testing.T) {
+	want := []string{"Go", "Java", "Python", "SQL", "JavaScript"}
+	if len(programmingLanguages) != len(want) {
+		t.Fatalf("programmingLanguages len = %d, want %d (%v)", len(programmingLanguages), len(want), programmingLanguages)
+	}
+	for i, lang := range want {
+		if programmingLanguages[i] != lang {
+			t.Errorf("programmingLanguages[%d] = %q, want %q", i, programmingLanguages[i], lang)
+		}
+	}
+}
+
+func TestSpokenLanguageLevels(t *testing.T) {
+	byLabel := map[string]string{}
+	for _, l := range spokenLanguages {
+		byLabel[l.Label] = l.Tag
+	}
+	if byLabel["English"] == "Native" {
+		t.Errorf("English must not claim Native proficiency")
+	}
+	if got := byLabel["English"]; got != "Full professional" && got != "Advanced" {
+		t.Errorf("English tag = %q, want Full professional or Advanced", got)
+	}
+	if got := byLabel["Spanish"]; got != "Professional working" && got != "Intermediate" {
+		t.Errorf("Spanish tag = %q, want Professional working or Intermediate", got)
+	}
+	if byLabel["Portuguese"] != "Native" {
+		t.Errorf("Portuguese tag = %q, want Native", byLabel["Portuguese"])
+	}
+}
+
+func TestLinkedInURL(t *testing.T) {
+	const want = "https://www.linkedin.com/in/guilherme-solski-alves/"
+	for _, link := range socialLinks {
+		if link.Label != "LinkedIn" {
+			continue
+		}
+		if link.Href != want {
+			t.Errorf("LinkedIn href = %q, want %q", link.Href, want)
+		}
+		if strings.Contains(link.Href, "566262160") {
+			t.Errorf("LinkedIn href still has the old numeric suffix: %q", link.Href)
+		}
+		return
+	}
+	t.Fatal("LinkedIn link not found in socialLinks")
+}
+
+func TestMercadoLibreAndFINKTimelineEntries(t *testing.T) {
+	var foundMELI, foundFINK bool
+	for _, entry := range timelineEntries {
+		switch entry.Date {
+		case "October 2022":
+			foundMELI = true
+			for _, fact := range []string{"Mercado Libre", "Go", "observability"} {
+				if !strings.Contains(entry.Body, fact) {
+					t.Errorf("October 2022 entry missing %q: %q", fact, entry.Body)
+				}
+			}
+		case "May 2025":
+			foundFINK = true
+			for _, fact := range []string{"FINK AI", "part-time", "20,000+", "4.2M+"} {
+				if !strings.Contains(entry.Body, fact) {
+					t.Errorf("May 2025 entry missing %q: %q", fact, entry.Body)
+				}
+			}
+		}
+	}
+	if !foundMELI {
+		t.Error("missing October 2022 Mercado Libre timeline entry")
+	}
+	if !foundFINK {
+		t.Error("missing May 2025 FINK AI timeline entry")
 	}
 }
 

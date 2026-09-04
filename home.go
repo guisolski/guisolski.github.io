@@ -6,6 +6,8 @@ import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
+const introEyebrow = "Backend software engineer · Go · Mercado Libre"
+
 type Home struct {
 	app.Compo
 
@@ -27,7 +29,7 @@ func (h *Home) renderIntro() app.UI {
 			Alt("Portrait of Guilherme Solski Alves").
 			Width(72).
 			Height(72),
-		app.P().Class("eyebrow").Text("Software developer · Mercado Libre"),
+		app.P().Class("eyebrow").Text(introEyebrow),
 		app.H1().Class("intro__name").Body(
 			app.Button().
 				Class("intro__name-button").
