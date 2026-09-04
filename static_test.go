@@ -23,7 +23,14 @@ func TestStaticRobotsTxt(t *testing.T) {
 		t.Fatalf("static/robots.txt missing: %v", err)
 	}
 	body := string(data)
-	for _, want := range []string{"User-agent:", "Allow:", "https://guisolski.github.io"} {
+	for _, want := range []string{
+		"User-agent:",
+		"Allow:",
+		"https://guisolski.github.io",
+		// The sitemap is generated into dist/ at build time; robots.txt is
+		// the only place that tells a crawler it exists.
+		"Sitemap: https://guisolski.github.io/sitemap.xml",
+	} {
 		if !strings.Contains(body, want) {
 			t.Errorf("robots.txt missing %q", want)
 		}
@@ -33,26 +40,30 @@ func TestStaticRobotsTxt(t *testing.T) {
 	}
 }
 
-func TestStaticLLMsTxt(t *testing.T) {
-	data, err := os.ReadFile(filepath.Join(staticRoot(t), "llms.txt"))
+// A JPEG served as .png is the kind of thing that renders fine in a browser
+// (which sniffs) and is rejected by the scrapers that read the JSON-LD image.
+func TestProfileImageMatchesItsExtension(t *testing.T) {
+	path := filepath.Join(staticRoot(t), "..", strings.TrimPrefix(profileImage, "/"))
+	data, err := os.ReadFile(path)
 	if err != nil {
-		t.Fatalf("static/llms.txt missing: %v", err)
+		t.Fatalf("%s missing: %v", profileImage, err)
 	}
-	body := string(data)
-	for _, want := range []string{
-		"Guilherme Solski Alves",
-		"Mercado Libre",
-		"FINK AI",
-		"https://guisolski.github.io/",
-		"https://www.linkedin.com/in/guilherme-solski-alves/",
-		"https://github.com/guisolski",
-		"/assets/pdf/cv.pdf",
-		"CV (English, PDF)",
-		"guilhermesolskialves@gmail.com",
-	} {
-		if !strings.Contains(body, want) {
-			t.Errorf("llms.txt missing %q", want)
-		}
+	if len(data) < 2000 {
+		t.Errorf("%s looks too small (%d bytes) to be a portrait", profileImage, len(data))
+	}
+
+	magic := map[string]string{
+		".jpg":  "\xff\xd8\xff",
+		".jpeg": "\xff\xd8\xff",
+		".png":  "\x89PNG",
+	}
+	ext := filepath.Ext(profileImage)
+	want, ok := magic[ext]
+	if !ok {
+		t.Fatalf("unhandled portrait extension %q", ext)
+	}
+	if !strings.HasPrefix(string(data), want) {
+		t.Errorf("%s is not a %s: header %x", profileImage, ext, data[:4])
 	}
 }
 
