@@ -24,3 +24,24 @@ func TestIsExternal(t *testing.T) {
 		})
 	}
 }
+
+func TestIsAssetLink(t *testing.T) {
+	tests := []struct {
+		href string
+		want bool
+	}{
+		{"/assets/pdf/cv.pdf", true},
+		{"/assets/pdf/Curriculum/portugues.pdf", true},
+		{"/assets/images/ifpr_certified.jpeg", true},
+		{"https://github.com/guisolski", false},
+		{"/relax", false},
+		{"", false},
+	}
+	for _, tc := range tests {
+		t.Run(tc.href, func(t *testing.T) {
+			if got := isAssetLink(tc.href); got != tc.want {
+				t.Errorf("isAssetLink(%q) = %v, want %v", tc.href, got, tc.want)
+			}
+		})
+	}
+}

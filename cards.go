@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 )
@@ -101,7 +102,9 @@ func (r linkRenderer) render(i int) app.UI {
 		icon(l.Icon),
 		app.Span().Text(l.Label),
 	)
-	if isExternal(l.Href) {
+	// go-app intercepts same-origin <a> clicks as SPA navigation unless
+	// target=_blank or download is set; open assets in a new tab so PDFs load.
+	if isExternal(l.Href) || isAssetLink(l.Href) {
 		a = a.Target("_blank").Rel("noopener")
 	}
 	return app.Li().Body(a)
@@ -109,6 +112,10 @@ func (r linkRenderer) render(i int) app.UI {
 
 func isExternal(href string) bool {
 	return len(href) > 4 && href[:4] == "http"
+}
+
+func isAssetLink(href string) bool {
+	return strings.HasPrefix(href, "/assets/")
 }
 
 func linkList(links []Link) app.UI {
