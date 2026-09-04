@@ -37,8 +37,8 @@ func newHandler() *app.Handler {
 	return &app.Handler{
 		Name:            "Guilherme Solski Alves",
 		ShortName:       "Solski",
-		Title:           "Guilherme Solski Alves — Software Developer",
-		Description:     "Software developer at Mercado Libre. Career timeline, contact, and résumé.",
+		Title:           "Guilherme Solski Alves — Backend Software Engineer",
+		Description:     "Backend software engineer writing Go at Mercado Libre. Career timeline, contact, and résumé.",
 		Author:          "Guilherme Solski Alves",
 		Lang:            "en",
 		Icon:            app.Icon{Default: "/web/icon-192.png", Large: "/web/icon-512.png"},
