@@ -20,6 +20,11 @@ Deployment is automated: every push to `master` runs
 `.github/workflows/deploy.yml`, which builds the WASM binary, generates the
 static site with prerendered HTML, and publishes it to GitHub Pages.
 
+Files under `static/` (for example `robots.txt` and `llms.txt`) are copied to
+the site root by `make dist`, so they are served at
+`https://guisolski.github.io/robots.txt` and
+`https://guisolski.github.io/llms.txt` after deploy.
+
 ## Design notes
 
 - **Determinism via explicit inputs (`canvas.go`)**: `advanceStar`,

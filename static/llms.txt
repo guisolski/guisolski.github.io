@@ -1,0 +1,26 @@
+# Guilherme Solski Alves
+
+> Backend software engineer writing Go at Mercado Libre. Part-time co-founder of FINK AI.
+
+## Summary
+
+Guilherme Solski Alves is a backend engineer with 7+ years in production systems, based in Curitiba, Paraná, Brazil. At Mercado Libre (2022–Present) he writes Go for e-commerce platforms serving 1M+ customers and owns observability end to end (OpenTelemetry; New Relic, Grafana, Datadog, Kibana). Part-time co-founder of FINK AI since 2025 (20,000+ users, 4.2M+ financial records). Previously ExxonMobil (Java, Azure/Terraform, Kafka). Open to full-time backend roles (remote or relocation).
+
+## Links
+
+- Site: https://guisolski.github.io/
+- LinkedIn: https://www.linkedin.com/in/guilherme-solski-alves/
+- GitHub: https://github.com/guisolski
+- Résumé (English PDF): https://guisolski.github.io/assets/pdf/resume.pdf
+- Currículo (Portuguese PDF): https://guisolski.github.io/assets/pdf/Curriculum/portugues.pdf
+
+## Contact
+
+- Email: guilhermesolskialves@gmail.com
+- Phone: +55 41 99628-6624
+
+## Education
+
+- MBA, Data Science & Analytics — USP / ESALQ (2022–2024)
+- Bachelor of Computer Science — PUCPR (2018–2021)
+- Digital Game Developer — IFPR technical certificate (2015–2017)

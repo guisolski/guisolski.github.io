@@ -13,6 +13,7 @@ func TestIsExternal(t *testing.T) {
 		{"mailto link", "mailto:guilhermesolskialves@gmail.com", false},
 		{"tel link", "tel:+5541996286624", false},
 		{"relative link", "/assets/pdf/faculdade.pdf", false},
+		{"empty href", "", false},
 		{"short string", "ht", false},
 	}
 	for _, tc := range tests {

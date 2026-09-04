@@ -162,7 +162,7 @@ func TestLinksValid(t *testing.T) {
 		"social":  socialLinks,
 		"contact": contactLinks,
 		"courses": courseLinks,
-		"resume":  {resumeLink},
+		"resume":  resumeLinks,
 	}
 
 	for group, links := range groups {
@@ -170,6 +170,12 @@ func TestLinksValid(t *testing.T) {
 			t.Run(group+"/"+link.Label, func(t *testing.T) {
 				if link.Label == "" {
 					t.Fatal("empty label")
+				}
+				if link.Href == "" {
+					if group != "courses" {
+						t.Errorf("empty href only allowed for education items, got group %q", group)
+					}
+					return
 				}
 				switch {
 				case strings.HasPrefix(link.Href, "https://"),
@@ -181,5 +187,38 @@ func TestLinksValid(t *testing.T) {
 				}
 			})
 		}
+	}
+}
+
+func TestEducationIncludesMBA(t *testing.T) {
+	var found bool
+	for _, link := range courseLinks {
+		if strings.Contains(link.Label, "MBA") && strings.Contains(link.Label, "USP") && strings.Contains(link.Label, "ESALQ") {
+			found = true
+			if link.Href != "" {
+				t.Errorf("MBA education item must be text-only (no diploma PDF); got href %q", link.Href)
+			}
+			if !strings.Contains(link.Label, "2022") || !strings.Contains(link.Label, "2024") {
+				t.Errorf("MBA label should include years 2022–2024: %q", link.Label)
+			}
+		}
+	}
+	if !found {
+		t.Fatal("courseLinks missing MBA, Data Science & Analytics — USP / ESALQ")
+	}
+}
+
+func TestResumeLinks(t *testing.T) {
+	if len(resumeLinks) < 2 {
+		t.Fatalf("expected English and Portuguese résumé links, got %d", len(resumeLinks))
+	}
+	if resumeLinks[0].Href != "/assets/pdf/resume.pdf" {
+		t.Errorf("English résumé href = %q", resumeLinks[0].Href)
+	}
+	if resumeLinks[1].Href != "/assets/pdf/Curriculum/portugues.pdf" {
+		t.Errorf("Portuguese résumé href = %q", resumeLinks[1].Href)
+	}
+	if resumeLink.Href != resumeLinks[0].Href {
+		t.Errorf("resumeLink should alias the English résumé")
 	}
 }

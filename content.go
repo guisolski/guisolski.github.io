@@ -126,9 +126,16 @@ var contactLinks = []Link{
 var courseLinks = []Link{
 	{Label: "Digital Game Developer — technical certificate", Href: "/assets/images/ifpr_certified.jpeg", Icon: "badge"},
 	{Label: "Bachelor of Computer Science — diploma", Href: "/assets/pdf/faculdade.pdf", Icon: "badge"},
+	{Label: "MBA, Data Science & Analytics — USP / ESALQ (2022–2024)", Href: "", Icon: "badge"},
 }
 
-var resumeLink = Link{Label: "Résumé (English, PDF)", Href: "/assets/pdf/resume.pdf", Icon: "file"}
+var resumeLinks = []Link{
+	{Label: "Résumé (English, PDF)", Href: "/assets/pdf/resume.pdf", Icon: "file"},
+	{Label: "Currículo (Português, PDF)", Href: "/assets/pdf/Curriculum/portugues.pdf", Icon: "file"},
+}
+
+// resumeLink is kept for callers/tests that expect the English résumé path.
+var resumeLink = resumeLinks[0]
 
 type Tagged struct {
 	Label string
