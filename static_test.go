@@ -23,36 +23,20 @@ func TestStaticRobotsTxt(t *testing.T) {
 		t.Fatalf("static/robots.txt missing: %v", err)
 	}
 	body := string(data)
-	for _, want := range []string{"User-agent:", "Allow:", "https://guisolski.github.io"} {
+	for _, want := range []string{
+		"User-agent:",
+		"Allow:",
+		"https://guisolski.github.io",
+		// The sitemap is generated into dist/ at build time; robots.txt is
+		// the only place that tells a crawler it exists.
+		"Sitemap: https://guisolski.github.io/sitemap.xml",
+	} {
 		if !strings.Contains(body, want) {
 			t.Errorf("robots.txt missing %q", want)
 		}
 	}
 	if strings.Contains(strings.ToLower(body), "disallow: /") && !strings.Contains(body, "Allow: /") {
 		t.Error("robots.txt should allow crawling of the public site")
-	}
-}
-
-func TestStaticLLMsTxt(t *testing.T) {
-	data, err := os.ReadFile(filepath.Join(staticRoot(t), "llms.txt"))
-	if err != nil {
-		t.Fatalf("static/llms.txt missing: %v", err)
-	}
-	body := string(data)
-	for _, want := range []string{
-		"Guilherme Solski Alves",
-		"Mercado Libre",
-		"FINK AI",
-		"https://guisolski.github.io/",
-		"https://www.linkedin.com/in/guilherme-solski-alves/",
-		"https://github.com/guisolski",
-		"/assets/pdf/cv.pdf",
-		"CV (English, PDF)",
-		"guilhermesolskialves@gmail.com",
-	} {
-		if !strings.Contains(body, want) {
-			t.Errorf("llms.txt missing %q", want)
-		}
 	}
 }
 

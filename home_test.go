@@ -20,8 +20,10 @@ func TestPageClass(t *testing.T) {
 	}
 }
 
+// The eyebrow answers the two questions a recruiter opens with — what he
+// does and whether he can work from where he is — before the name is read.
 func TestIntroEyebrow(t *testing.T) {
-	const want = "Backend software engineer · Go · Mercado Libre"
+	const want = "Backend engineer · Go · Remote, UTC−3"
 	if introEyebrow != want {
 		t.Errorf("introEyebrow = %q, want %q", introEyebrow, want)
 	}

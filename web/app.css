@@ -1,43 +1,35 @@
-/* Guilherme Solski Alves — clean light minimal, colored as a dawn.
-   The page hides a night scene (#05004c sky, amber stars) behind the name;
-   the day page borrows its spectrum: night indigo → dusk rose → star amber.
-   Color is information — the career timeline travels the spectrum from
-   student (indigo, 2015) to today (amber, 2023) — and the surfaces now wear
-   that information: each panel is washed in its own stop of the spectrum.
+/* Guilherme Solski Alves — a light, minimal page coloured as a dawn.
+
+   One rule governs every colour on this page: hue encodes a position in
+   time. The career rail travels the spectrum from student (indigo 245°,
+   2015) to today (amber 35°, 2025), and the sections below inherit their
+   stop from the same walk, so scrolling the page warms it the way scrubbing
+   the rail does. Nothing is tinted for decoration alone.
+
    System fonts only: zero font bytes, zero external requests. */
 
 :root {
   --paper: #ffffff;
   --ink: #1d1e42;
   --body-text: #40425f;
-  --muted: #616380;
+  --muted: #616380;      /* 5.83:1 on paper — smallest AA text colour */
+  --soft: #83859c;       /* 3.62:1 — icons and rules only, never text */
   --line: #e6e7f0;
   --accent: #8f5700;
-  --accent-bright: #eda43b;
   --night: #05004c;
   --dawn-indigo: hsl(245 70% 58%);
   --dawn-rose: hsl(320 65% 55%);
   --dawn-amber: hsl(35 90% 55%);
-  /* deep stops for glyphs — the raw dawn tokens are too light to pass AA
-     as text on white */
-  --dawn-indigo-deep: hsl(245 60% 46%);
-  --dawn-rose-deep: hsl(320 60% 40%);
-  --dawn-amber-deep: hsl(35 95% 36%);
   --dawn-line: linear-gradient(90deg, var(--dawn-indigo), var(--dawn-rose) 55%, var(--dawn-amber));
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-back: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Registered so the conic avatar ring can rotate. */
-@property --ring-a {
-  syntax: "<angle>";
-  inherits: false;
-  initial-value: 220deg;
-}
-
-/* Registered so the timeline panel's wash glides across the spectrum when
-   the selected year changes. inherits: true is load-bearing — the nav
-   arrows read the section-level hue. */
+/* Registered so the timeline glides across the spectrum when the selected
+   year changes instead of snapping. inherits: true is load-bearing — the
+   nav arrows read the hue set on the section. */
 @property --year-h {
   syntax: "<number>";
   inherits: true;
@@ -80,7 +72,7 @@ body {
 .page {
   max-width: 60rem;
   margin: 0 auto;
-  padding: 0 clamp(1.25rem, 5vw, 3rem);
+  padding: 0 clamp(1.25rem, 5vw, 3rem) 0;
   transition: transform 0.5s ease, opacity 0.5s ease;
 }
 
@@ -89,16 +81,20 @@ body {
   opacity: 0;
 }
 
+/* Above the fold the entrance follows the clock, staggered by reading
+   order. Below it, the scroll takes over (see the @supports block). */
 .intro,
 .timeline,
+.focus,
 .cards,
 .footer {
-  animation: rise 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  animation: rise 0.6s var(--ease-out) both;
 }
 
 .timeline { animation-delay: 0.08s; }
-.cards { animation-delay: 0.16s; }
-.footer { animation-delay: 0.24s; }
+.focus { animation-delay: 0.14s; }
+.cards { animation-delay: 0.2s; }
+.footer { animation-delay: 0.26s; }
 
 @keyframes rise {
   from {
@@ -107,53 +103,63 @@ body {
   }
 }
 
-/* Below the fold, entrances follow the scroll instead of the clock: each
-   card reveals on its own view() timeline, so the cascade comes free from
-   document order. Fenced by @supports — everywhere else the load-time rise
-   above still runs, so nothing can be left invisible. The range completes
-   early (entry 45%) so cards straddling the fold at load are near-opaque. */
+/* Each element reveals on its own view() timeline, so the cascade comes free
+   from document order. Fenced by @supports — everywhere else the load-time
+   rise above still runs, so nothing can be left invisible. The range
+   completes early so elements straddling the fold at load are near-opaque. */
 @supports (animation-timeline: view()) {
+  .focus,
   .cards {
     animation: none;
   }
 
+  .focus__item,
   .card {
-    animation: card-reveal ease both;
+    animation: rise 1s var(--ease-out) both;
     animation-timeline: view(); /* must follow the shorthand — it resets this */
-    animation-range: entry 5% entry 45%;
+    animation-range: entry 4% entry 46%;
   }
 
   .footer {
-    animation: rise ease both;
+    animation: rise 1s var(--ease-out) both;
     animation-timeline: view();
     animation-range: entry 0% entry 60%;
   }
 }
 
-@keyframes card-reveal {
-  from {
-    opacity: 0;
-    transform: translateY(1.25rem) scale(0.98);
-  }
+/* ---- section labels ---- */
+
+.section-label {
+  margin: 0;
+  font: 600 0.75rem/1.4 var(--font-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
 /* ---- intro ---- */
 
 .intro {
   position: relative;
-  padding-top: clamp(3rem, 10vh, 6rem);
+  padding-top: clamp(3rem, 10vh, 5.5rem);
 }
 
-/* The aurora behind the intro: the night scene's colors bleeding into the
+/* The aurora behind the intro: the night scene's colours bleeding into the
    morning page. Two layers drifting in counter-phase with mismatched
    periods, so the sky never reads as a loop. Hotspots stay off the text
-   column; transform/opacity only, so both layers live on the compositor. */
+   column; transform and opacity only, so both live on the compositor. */
 .intro::before,
 .intro::after {
   content: "";
   position: absolute;
   z-index: -1;
-  inset: -6rem -12rem auto;
+  top: -6rem;
+  /* Full-bleed regardless of how wide the text column happens to be: an
+     inset measured from the column leaves a visible seam at some viewport
+     widths. body's overflow-x: clip absorbs the scrollbar's worth of vw. */
+  left: 50%;
+  width: 100vw;
+  margin-left: -50vw;
   height: 26rem;
   pointer-events: none;
 }
@@ -176,50 +182,56 @@ body {
 }
 
 @keyframes aurora-drift {
-  from {
-    transform: translate3d(-1.5%, -1%, 0) scale(1);
-  }
-  to {
-    transform: translate3d(1.5%, 2%, 0) scale(1.06);
-  }
+  from { transform: translate3d(-1.5%, -1%, 0) scale(1); }
+  to { transform: translate3d(1.5%, 2%, 0) scale(1.06); }
 }
 
 @keyframes aurora-breathe {
-  from {
-    opacity: 0.65;
-    transform: translate3d(1%, 1%, 0);
-  }
-  to {
-    opacity: 1;
-    transform: translate3d(-1%, -1.5%, 0);
-  }
+  from { opacity: 0.65; transform: translate3d(1%, 1%, 0); }
+  to { opacity: 1; transform: translate3d(-1%, -1.5%, 0); }
 }
 
-/* The dawn ring slowly orbits the avatar. Without @property the custom
-   property snaps 220deg → 580deg, a full turn — visually identical. */
-.intro__avatar {
-  --ring-a: 220deg;
+/* The dawn orbits the portrait. The ring is its own element rather than a
+   conic border on the avatar, so the rotation is a plain transform on the
+   compositor instead of an interpolated custom property. */
+.avatar {
+  position: relative;
   display: block;
-  width: 72px;
-  height: 72px;
-  padding: 3px;
+  width: 84px;
+  height: 84px;
+  margin-bottom: 1.5rem;
+}
+
+.avatar__ring {
+  position: absolute;
+  inset: 0;
   border-radius: 50%;
-  border: 2px solid transparent;
-  background:
-    linear-gradient(var(--paper), var(--paper)) padding-box,
-    conic-gradient(from var(--ring-a), var(--dawn-indigo), var(--dawn-rose), var(--dawn-amber), var(--dawn-indigo)) border-box;
-  margin-bottom: 1.25rem;
+  background: conic-gradient(
+    var(--dawn-indigo),
+    var(--dawn-rose),
+    var(--dawn-amber),
+    var(--dawn-indigo)
+  );
   animation: ring-spin 16s linear infinite;
 }
 
 @keyframes ring-spin {
-  to {
-    --ring-a: 580deg;
-  }
+  to { transform: rotate(360deg); }
+}
+
+.avatar__img {
+  position: absolute;
+  inset: 4px;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  border: 2px solid var(--paper);
+  background: var(--paper);
+  object-fit: cover;
 }
 
 .eyebrow {
-  margin: 0 0 1rem;
+  margin: 0 0 0.875rem;
   font: 500 0.8125rem/1.4 var(--font-mono);
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -227,189 +239,163 @@ body {
 }
 
 .intro__name {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
   margin: 0 0 1.5rem;
-  font-size: clamp(2.5rem, 8vw, 4.25rem);
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  font-size: clamp(2.5rem, 8vw, 3.75rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
   line-height: 1.05;
   color: var(--ink);
 }
 
-.intro__name-button {
-  all: unset;
-  display: inline-block; /* inline boxes ignore transforms and fragment the
-                            clipped gradient per line */
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-
-.intro__name-button::after {
-  content: " ✦";
-  font-size: 0.5em;
-  vertical-align: super;
-  color: var(--accent-bright);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.intro__name-button:hover {
-  color: var(--night);
-}
-
-.intro__name-button:hover::after,
-.intro__name-button:focus-visible::after {
-  opacity: 1;
-}
-
-.intro__name-button:active {
-  transform: scale(0.985);
-}
-
-/* The name wears the dawn itself: a slow-panning gradient clipped to the
-   glyphs, deep stops so large-text AA holds. Hovering fades the glyphs to
-   night ink via text-fill-color (a color, so it transitions) — the same
-   "name turns to night + star appears" story as the solid fallback outside
-   this query. The gradient lives on the inner span, not the button: a
-   parent's clipped background paints through every descendant glyph, so
-   putting it on the button would render the hidden ✦ star in gradient ink.
-   First and last stops match, so the 300% pan loops seamlessly. */
+/* The name wears the dawn itself: a slow pan clipped to the glyphs, deep
+   stops so AA holds. First and last stops match, so the 300% pan loops
+   seamlessly. Kept off the h1 itself — a parent's clipped background paints
+   through every descendant, which would swallow the star link beside it. */
 @supports (-webkit-background-clip: text) or (background-clip: text) {
-  .intro__name-text {
-    background-image: linear-gradient(
-      100deg,
-      var(--dawn-indigo-deep),
-      var(--dawn-rose-deep) 30%,
-      var(--dawn-amber-deep) 55%,
-      var(--dawn-rose-deep) 78%,
-      var(--dawn-indigo-deep)
-    );
+  .intro__name > span {
+    background-image: linear-gradient(100deg, #281e8f, #8f1e7e 30%, #8f601e 55%, #8f1e7e 78%, #281e8f);
     background-size: 300% 100%;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     animation: name-drift 22s linear infinite;
-    transition: -webkit-text-fill-color 0.3s ease;
-  }
-
-  .intro__name-button:hover .intro__name-text,
-  .intro__name-button:focus-visible .intro__name-text {
-    -webkit-text-fill-color: var(--night);
   }
 }
 
 @keyframes name-drift {
-  to {
-    background-position: -300% 0;
-  }
+  to { background-position: -300% 0; }
+}
+
+/* The night scene is a real link beside the heading, not a heading that is
+   secretly a button: crawlers follow it, the h1 stays an h1. */
+/* inline-flex, not inline: as a flex item the link would otherwise be
+   blockified into a line box as tall as the 60px heading, dropping the
+   16px star onto the name's baseline. em keeps it tracking the clamp(). */
+.intro__star {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-top: 0.22em;
+  color: var(--soft);
+  transition: color 0.25s ease, transform 0.4s var(--ease-back);
+}
+
+.intro__star:hover,
+.intro__star:focus-visible {
+  color: var(--accent);
+  transform: rotate(72deg) scale(1.15);
+}
+
+.intro__lead {
+  margin: 0 0 0.75rem;
+  max-width: 45rem;
+  font-size: 1.1875rem;
+  line-height: 1.6;
+  color: var(--ink);
 }
 
 .intro__about {
   margin: 0;
-  max-width: 44rem;
+  max-width: 45rem;
   font-size: 1.0625rem;
+  text-wrap: pretty;
 }
 
 /* ---- timeline (the signature) ---- */
 
-/* The panel is washed in the selected year's stop of the spectrum; with
-   --year-h registered, the wash glides as the years change (and simply
-   snaps where @property is unsupported). */
 .timeline {
   margin-top: clamp(3rem, 8vh, 5rem);
-  padding: clamp(1.25rem, 4vw, 2rem);
-  border-radius: 20px;
-  border: 1px solid hsl(var(--year-h) 45% 91%);
-  background: linear-gradient(135deg, hsl(var(--year-h) 60% 97.5%), hsl(var(--year-h) 35% 99%) 70%);
-  transition: --year-h 0.45s ease;
+  padding-top: 2.5rem;
+  border-top: 1px solid var(--line);
 }
 
 .timeline:focus-visible {
   outline-offset: 8px;
 }
 
-.timeline__rail {
+.timeline__head {
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 1.75rem;
 }
 
 .timeline__nav {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* The step buttons borrow the selected year's hue from the section, so the
+   controls sit in the same moment as the panel they are moving through. */
+.timeline__step {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid hsl(var(--year-h) 50% 78%);
   border-radius: 50%;
-  border: 1px solid var(--line);
   background: var(--paper);
   color: var(--ink);
   cursor: pointer;
-  transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  transition: border-color 0.3s ease, color 0.2s ease, transform 0.2s ease;
 }
 
-/* --year-h is the dawn-spectrum hue: the selected year's hue on the section
-   root (so the nav arrows warm up as the career advances), each year's own
-   hue on its dot and event panel. */
-.timeline__nav:hover:enabled {
-  border-color: hsl(var(--year-h) 60% 55%);
-  color: hsl(var(--year-h) 65% 36%);
-}
-
-.timeline__nav:active:enabled {
-  transform: scale(0.92);
-}
-
-.timeline__nav:disabled {
+.timeline__step:disabled {
   opacity: 0.35;
   cursor: default;
 }
 
-.timeline__nav svg {
-  transition: transform 0.2s ease;
-}
+.timeline__step:hover:enabled { transform: scale(1.06); }
+.timeline__step:active:enabled { transform: scale(0.92); }
 
-.timeline__nav--prev:hover:enabled svg {
-  transform: translateX(-2px);
-}
-
-.timeline__nav--next:hover:enabled svg {
-  transform: translateX(2px);
-}
-
-.timeline__track {
-  flex: 1;
+/* On a narrow screen the rail is wider than the page and scrolls; the mask
+   fades whatever is cut off rather than letting it end mid-dot. */
+.timeline__rail {
+  position: relative;
   overflow-x: auto;
-  scroll-behavior: smooth;
   scrollbar-width: none;
 }
 
-.timeline__track::-webkit-scrollbar {
+.timeline__rail::-webkit-scrollbar {
   display: none;
 }
 
+/* max-content, not 100%: once the dots overflow a narrow screen the strip
+   must grow with them, or the rail line stays viewport-wide and stops
+   halfway along a career that keeps going. */
 .timeline__strip {
   position: relative;
-  min-width: 100%;
   width: max-content;
+  min-width: 100%;
 }
 
+/* Half a column of inset at each end, computed from --dots, so the line
+   starts and stops under the first and last dot however many there are. */
 .timeline__line,
 .timeline__fill {
   position: absolute;
-  left: 0;
-  right: 0;
+  left: calc(50% / var(--dots));
+  right: calc(50% / var(--dots));
   bottom: 5px;
   height: 2px;
+  border-radius: 999px;
+}
+
+.timeline__line {
   background: var(--line);
 }
 
-/* The signature: advancing through the years reveals the dawn gradient,
-   clipped from the right edge (clip-path keeps the colors in place where a
-   scaleX would squash them). */
+/* The travelled part of the career, clipped rather than scaled — scaling
+   would squash the gradient and move every hue off its year. */
 .timeline__fill {
   background: var(--dawn-line);
-  transition: clip-path 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
+  transition: clip-path 0.5s var(--ease-out);
 }
 
 .timeline__dates {
@@ -419,229 +405,246 @@ body {
   list-style: none;
 }
 
-.timeline__dates li {
+.timeline__dates > li {
   flex: 1 1 0;
   display: flex;
   justify-content: center;
-  min-width: 3.25rem;
+  min-width: 2.75rem; /* below this the rail scrolls instead of crushing */
 }
 
 .timeline__date {
-  --year: hsl(var(--year-h) 65% 36%);
-  --year-bright: hsl(var(--year-h) 75% 55%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.55rem;
-  padding: 0.4rem 0.5rem 0;
+  gap: 7px;
+  padding: 0 4px;
   border: 0;
   background: none;
   cursor: pointer;
-  font: 500 0.8125rem/1 var(--font-mono);
   color: var(--muted);
-  transition: color 0.2s ease;
 }
 
-.timeline__date::after {
-  content: "";
-  position: relative;
-  z-index: 1;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: var(--paper);
-  border: 2px solid var(--line);
-  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+/* Both slots keep their line whether or not they are filled, so every year
+   label and every dot sits on one baseline across the rail. */
+.timeline__date-star {
+  display: block;
+  height: 11px;
+  color: hsl(var(--year-h) 65% 40%);
 }
 
-.timeline__date:hover {
-  color: var(--year);
+.timeline__date-year {
+  display: block;
+  height: 14px;
+  font: 400 0.75rem/14px var(--font-mono);
+  letter-spacing: 0.02em;
+  color: inherit;
 }
 
-.timeline__date:hover::after {
-  border-color: var(--year-bright);
-}
-
-.timeline__date:active::after {
-  transform: scale(0.9);
-}
-
-/* Passed dots keep their own year's hue, so the travelled rail reads as the
-   dawn spectrum, one small dot at a time. */
-.timeline__date--passed::after {
-  border-color: var(--year-bright);
-}
-
+.timeline__date--passed,
 .timeline__date--active {
-  color: var(--year);
+  color: hsl(var(--year-h) 65% 34%);
+}
+
+.timeline__date--active .timeline__date-year {
   font-weight: 700;
 }
 
-/* The active dot pulses in its own year's hue — a heartbeat on the rail. */
-.timeline__date--active::after {
-  border-color: var(--year-bright);
-  background: var(--year-bright);
-  transform: scale(1.2);
+/* The border carries the contrast (3.5:1 at every hue), the fill carries
+   the colour — so the brighter amber the design wants stays legible. */
+.timeline__dot {
+  display: block;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  background: var(--paper);
+  transition: transform 0.25s var(--ease-back), border-color 0.2s ease, background 0.2s ease;
+}
+
+.timeline__date--passed .timeline__dot {
+  border-color: hsl(var(--year-h) 62% 44%);
+}
+
+.timeline__date--active .timeline__dot {
+  border-color: hsl(var(--year-h) 62% 44%);
+  background: hsl(var(--year-h) 72% 55%);
+  transform: scale(1.25);
+}
+
+/* Only the active dot beats. Giving the animation its own class keeps the
+   other fourteen off the compositor. */
+.timeline__dot--beat {
   animation: dot-pulse 2.8s ease-out infinite;
 }
 
-.timeline__date--active:active::after {
-  transform: scale(1.05);
-}
-
 @keyframes dot-pulse {
-  0% {
-    box-shadow: 0 0 0 0 hsl(var(--year-h) 80% 55% / 0.4);
-  }
+  0% { box-shadow: 0 0 0 0 hsl(var(--year-h) 72% 55% / 0.5); }
   70%,
-  100% {
-    box-shadow: 0 0 0 9px hsl(var(--year-h) 80% 55% / 0);
-  }
+  100% { box-shadow: 0 0 0 10px hsl(0 0% 0% / 0); }
 }
 
+/* One panel at a time. The unselected ones are taken out of flow rather
+   than out of the document so the height stays the selected panel's. */
 .timeline__events {
-  display: grid;
-  margin-top: 2.25rem;
-  min-height: 8.5rem;
+  position: relative;
+  margin-top: 2.5rem;
+  /* Holds the height of a four-line milestone so stepping between short and
+     long ones does not shuffle the rest of the page under the reader. */
+  min-height: 11rem;
 }
 
 .timeline__event {
-  grid-area: 1 / 1;
-  opacity: 0;
+  position: absolute;
+  inset: 0;
   visibility: hidden;
+  opacity: 0;
 }
 
 .timeline__event--selected {
-  opacity: 1;
+  position: relative;
   visibility: visible;
+  opacity: 1;
 }
 
 .timeline__event--enter-right {
-  animation: slide-in-right 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
+  animation: slide-in-right 0.45s var(--ease-out) both;
 }
 
 .timeline__event--enter-left {
-  animation: slide-in-left 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
+  animation: slide-in-left 0.45s var(--ease-out) both;
 }
 
 @keyframes slide-in-right {
-  from {
-    opacity: 0;
-    transform: translateX(2.5rem);
-  }
+  from { opacity: 0; transform: translateX(1.5rem); }
 }
 
 @keyframes slide-in-left {
-  from {
-    opacity: 0;
-    transform: translateX(-2.5rem);
-  }
+  from { opacity: 0; transform: translateX(-1.5rem); }
 }
 
 .timeline__event-date {
-  margin: 0 0 0.5rem;
-  font: 600 0.875rem/1.4 var(--font-mono);
+  margin: 0 0 0.625rem;
+  font: 600 0.8125rem/1.4 var(--font-mono);
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: hsl(var(--year-h) 65% 36%);
+  color: hsl(var(--year-h) 65% 34%);
 }
 
 .timeline__event-body {
   margin: 0;
-  max-width: 44rem;
+  max-width: 45rem;
   font-size: 1.0625rem;
+  line-height: 1.7;
   color: var(--ink);
-}
-
-/* Honors: a small star marks the year on the rail — the night scene's ✦,
-   the same one hiding behind the name. No space before the year: a break
-   opportunity would wrap the label and push the dot off the rail. */
-.timeline__honor-star {
-  color: var(--accent-bright);
-  margin-right: 0.3em;
+  text-wrap: pretty;
 }
 
 .timeline__event-quote {
-  margin: 0.9rem 0 0;
+  margin: 1.125rem 0 0;
   padding-left: 1rem;
-  border-left: 2px solid hsl(var(--year-h) 60% 62%);
-  max-width: 44rem;
+  max-width: 45rem;
+  border-left: 2px solid hsl(var(--year-h) 62% 62%);
   font-size: 0.9375rem;
+  line-height: 1.65;
   font-style: italic;
   color: var(--body-text);
+}
+
+/* ---- timeline, prerendered ----
+   The rail shows one milestone at a time, which is right for a reader and
+   wrong for anything that only sees the HTML — fourteen of fifteen panels
+   would ship aria-hidden. So the prerendered page is the whole career as an
+   ordered list with machine-readable dates, and WASM swaps in the rail once
+   it boots. This is also what a reader sees for the second before that. */
+
+.timeline__list {
+  display: grid;
+  gap: 2rem;
+  margin: 2rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.timeline__entry {
+  padding-left: 1.25rem;
+  border-left: 2px solid hsl(var(--year-h) 62% 62%);
+}
+
+/* ---- what I work on ---- */
+
+.focus {
+  margin-top: clamp(3.5rem, 9vh, 5.5rem);
+  padding-top: 2.5rem;
+  border-top: 1px solid var(--line);
+}
+
+.focus__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: 2.5rem 3rem;
+  margin-top: 1.75rem;
+}
+
+.focus__rule {
+  display: block;
+  width: 40px;
+  height: 3px;
+  margin-bottom: 0.875rem;
+  border-radius: 999px;
+  background: hsl(var(--focus-h) 72% 55%);
+}
+
+.focus__title {
+  margin: 0 0 0.5rem;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.focus__body {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  text-wrap: pretty;
 }
 
 /* ---- cards ---- */
 
 .cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-  gap: 1rem;
-  margin-top: clamp(3rem, 8vh, 5rem);
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 3rem;
+  margin-top: clamp(3.5rem, 9vh, 5.5rem);
 }
 
-/* Each card permanently wears its stop of the spectrum as a whisper-light
-   wash (≥97% lightness where the title sits, so the mono text keeps AA). */
+/* No wash, no shadow: each card is named by a 2px rule in its own stop of
+   the dawn, and the reading order walks the spectrum. */
 .card {
-  --card-h: 245;
-  border: 1px solid hsl(var(--card-h) 45% 88%);
-  border-radius: 12px;
-  padding: 1.5rem;
-  background: linear-gradient(
-    160deg,
-    hsl(var(--card-h) 70% 97%),
-    hsl(var(--card-h) 55% 98.5%) 55%,
-    var(--paper)
-  );
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-/* Each card picks a stop on the dawn spectrum, in reading order — the same
-   left-to-right hue travel as the timeline above. */
-.card:nth-child(1) { --card-h: 245; }
-.card:nth-child(2) { --card-h: 275; }
-.card:nth-child(3) { --card-h: 305; }
-.card:nth-child(4) { --card-h: 335; }
-.card:nth-child(5) { --card-h: 5; }
-.card:nth-child(6) { --card-h: 35; }
-
-.card:hover {
-  border-color: hsl(var(--card-h) 55% 74%);
-  box-shadow: 0 12px 32px -16px hsl(var(--card-h) 60% 45% / 0.35);
-  transform: translateY(-4px);
+  padding-top: 1rem;
+  border-top: 2px solid hsl(var(--card-h) 72% 60%);
 }
 
 .card__title {
-  margin: 0 0 1.1rem;
+  margin: 0 0 0.875rem;
   font: 600 0.75rem/1.4 var(--font-mono);
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: hsl(var(--card-h) 30% 40%);
-}
-
-.card__title::before {
-  content: "";
-  display: inline-block;
-  width: 0.5rem;
-  height: 0.5rem;
-  margin-right: 0.55rem;
-  border-radius: 50%;
-  background: hsl(var(--card-h) 70% 55%);
+  color: hsl(var(--card-h) 45% 36%);
 }
 
 .card__note {
-  margin: 0.9rem 0 0;
-  font-size: 0.8125rem;
+  margin: 0.875rem 0 0;
+  font: 400 0.75rem/1.6 var(--font-mono);
+  letter-spacing: 0.02em;
   color: var(--muted);
 }
+
+/* ---- links ---- */
 
 .links {
   display: flex;
   flex-direction: column;
-  gap: 0.7rem;
+  gap: 0.6875rem;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -650,76 +653,65 @@ body {
 .links__item {
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.625rem;
+  font-size: 0.9375rem;
+  line-height: 1.4;
   color: var(--ink);
   text-decoration: none;
-  transition: color 0.2s ease;
   overflow-wrap: anywhere;
 }
 
+/* Not every line in a card is a destination — the location is a fact. */
 .links__item--plain {
-  cursor: default;
-}
-
-.links__item--plain span {
-  background: none;
-}
-
-.links__item--plain:hover,
-.links__item--plain:focus-visible {
-  color: var(--ink);
-}
-
-.links__item--plain:hover .icon,
-.links__item--plain:focus-visible .icon {
-  transform: none;
-  color: hsl(var(--card-h, 245) 55% 48%);
+  color: var(--body-text);
 }
 
 .links__item .icon {
   flex-shrink: 0;
-  color: hsl(var(--card-h, 245) 55% 48%);
-  transition: color 0.2s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  color: hsl(var(--card-h) 45% 48%);
+  transition: transform 0.25s var(--ease-back);
 }
 
-/* The underline draws itself left to right instead of just appearing. */
+/* The underline draws itself rather than switching on. */
 .links__item span {
   background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 0% 1px;
   transition: background-size 0.25s ease;
 }
 
-.links__item:hover,
-.links__item:focus-visible {
-  color: hsl(var(--card-h, 245) 65% 36%);
-}
-
-.links__item:hover span,
-.links__item:focus-visible span {
+a.links__item:hover span,
+a.links__item:focus-visible span {
   background-size: 100% 1px;
 }
 
-.links__item:hover .icon,
-.links__item:focus-visible .icon {
-  color: hsl(var(--card-h, 245) 65% 36%);
+a.links__item:hover .icon {
   transform: translateX(2px) scale(1.1);
 }
 
-.pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+/* ---- stack ---- */
+
+.stack {
   margin: 0;
-  padding: 0;
-  list-style: none;
+  font-size: 0.875rem;
+  line-height: 1.6;
 }
 
-.pill {
-  font: 500 0.8125rem/1 var(--font-mono);
-  color: var(--ink);
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 0.4rem 0.8rem;
+.stack__label {
+  font: 400 0.6875rem/1.6 var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
+
+.stack__items {
+  margin: 2px 0 0.625rem;
+  color: var(--ink);
+}
+
+.stack__group:last-child .stack__items {
+  margin-bottom: 0;
+}
+
+/* ---- spoken languages ---- */
 
 .tags {
   margin: 0;
@@ -732,8 +724,9 @@ body {
   align-items: baseline;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0.55rem 0;
+  padding: 0.4375rem 0;
   border-bottom: 1px solid var(--line);
+  font-size: 0.9375rem;
   color: var(--ink);
 }
 
@@ -742,51 +735,52 @@ body {
 }
 
 .tags__level {
-  font: 500 0.75rem/1.4 var(--font-mono);
+  font: 400 0.6875rem/1.6 var(--font-mono);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--muted);
+  white-space: nowrap;
 }
 
 /* ---- footer ---- */
 
-/* The footer's top rule is the fully revealed dawn line — the timeline's
-   gradient, completed, closing the page. */
 .footer {
   position: relative;
-  margin-top: clamp(3rem, 8vh, 5rem);
-  padding: 1.5rem 0 2.5rem;
+  margin-top: clamp(3.5rem, 9vh, 5.5rem);
+  padding: 1.5rem 0 3.5rem;
   font: 400 0.8125rem/1.6 var(--font-mono);
   color: var(--muted);
-  background: linear-gradient(180deg, transparent, hsl(35 80% 97.5%));
 }
 
-/* A shine sweeps the completed dawn line every few seconds — mostly rest,
-   one glint. The 2px repaint is free. */
-.footer::before {
-  content: "";
+/* The rail, completed: the same gradient the timeline fills in, closing the
+   page. A shine crosses it every eight seconds — mostly rest, one glint. */
+.footer__rule {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 2px;
   border-radius: 999px;
+  opacity: 0.9;
   background:
     linear-gradient(100deg, transparent 42%, hsl(0 0% 100% / 0.85) 50%, transparent 58%) no-repeat,
     var(--dawn-line);
   background-size: 250% 100%, 100% 100%;
-  opacity: 0.85;
   animation: shimmer-sweep 8s ease-in-out infinite;
 }
 
 @keyframes shimmer-sweep {
   0%,
-  55% {
-    background-position: 220% 0, 0 0;
-  }
-  100% {
-    background-position: -120% 0, 0 0;
-  }
+  55% { background-position: 220% 0, 0 0; }
+  100% { background-position: -120% 0, 0 0; }
+}
+
+.footer__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
 .footer p {
@@ -813,9 +807,7 @@ body {
 }
 
 @keyframes night-fall {
-  from {
-    opacity: 0;
-  }
+  from { opacity: 0; }
 }
 
 .relax__canvas {
@@ -881,47 +873,36 @@ body {
   border-radius: 50%;
 }
 
+/* ---- narrow screens ---- */
+
+@media (max-width: 40rem) {
+  .timeline__rail {
+    /* The rail overflows here; fade the cut edge instead of ending mid-dot.
+       Only the left — the rail opens scrolled to today, and a fade on the
+       right would dim the one year the reader came for. */
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 28px);
+    mask-image: linear-gradient(90deg, transparent, #000 28px);
+  }
+
+  .timeline__events {
+    min-height: 15rem;
+  }
+
+  .cards {
+    gap: 2.25rem;
+  }
+}
+
 /* ---- motion preferences ---- */
 
-/* Everything stops but nothing disappears: still aurora wash, still ring,
-   still gradient name, cards simply visible. This block stays last so it
-   outranks the @supports reveals by source order. */
+/* Everything stops but nothing disappears: still aurora, still ring, still
+   gradient name, cards simply visible. This block stays last so it outranks
+   the @supports reveals by source order. */
 @media (prefers-reduced-motion: reduce) {
-  .intro,
-  .intro::before,
-  .intro::after,
-  .intro__avatar,
-  .intro__name-button,
-  .timeline,
-  .timeline__date--active::after,
-  .cards,
-  .card,
-  .footer,
-  .footer::before,
-  .timeline__event--enter-right,
-  .timeline__event--enter-left,
-  .relax {
-    animation: none;
-  }
-
-  .intro__name-text {
-    animation: none;
-  }
-
-  .page,
-  .timeline,
-  .timeline__fill,
-  .timeline__nav,
-  .timeline__nav svg,
-  .card,
-  .links__item span,
-  .links__item .icon,
-  .intro__name-button,
-  .intro__name-text {
-    transition: none;
-  }
-
-  .timeline__track {
-    scroll-behavior: auto;
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
   }
 }

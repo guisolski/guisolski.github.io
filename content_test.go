@@ -27,6 +27,16 @@ func TestTimelineEntriesComplete(t *testing.T) {
 			if !strings.Contains(entry.Date, entry.Year) {
 				t.Errorf("rail label %q does not match date %q", entry.Year, entry.Date)
 			}
+			// <time datetime> is how a crawler reads the career; a missing or
+			// malformed value silently downgrades the whole timeline to prose.
+			if !strings.HasPrefix(entry.Time, entry.Year) {
+				t.Errorf("datetime %q does not start with year %q", entry.Time, entry.Year)
+			}
+			if _, err := time.Parse("2006-01", entry.Time); err != nil {
+				if _, err := time.Parse("2006", entry.Time); err != nil {
+					t.Errorf("datetime %q is neither YYYY-MM nor YYYY", entry.Time)
+				}
+			}
 		})
 	}
 }
@@ -81,15 +91,61 @@ func TestAboutTextPositioning(t *testing.T) {
 	}
 }
 
-func TestProgrammingLanguagesOrder(t *testing.T) {
-	want := []string{"Go", "Java", "Python", "SQL", "JavaScript"}
-	if len(programmingLanguages) != len(want) {
-		t.Fatalf("programmingLanguages len = %d, want %d (%v)", len(programmingLanguages), len(want), programmingLanguages)
-	}
-	for i, lang := range want {
-		if programmingLanguages[i] != lang {
-			t.Errorf("programmingLanguages[%d] = %q, want %q", i, programmingLanguages[i], lang)
+func TestStackGroups(t *testing.T) {
+	byLabel := map[string][]string{}
+	for _, g := range stack {
+		if g.Label == "" {
+			t.Errorf("stack group has an empty label: %+v", g)
 		}
+		if len(g.Items) == 0 {
+			t.Errorf("stack group %q is empty", g.Label)
+		}
+		byLabel[g.Label] = g.Items
+	}
+
+	langs := byLabel["Languages"]
+	if len(langs) == 0 {
+		t.Fatalf("stack is missing a Languages group: %+v", stack)
+	}
+	if langs[0] != "Go" {
+		t.Errorf("Languages[0] = %q, want Go — it is the backend language", langs[0])
+	}
+
+	// The CV's honesty rules: TypeScript is frontend only, and there is no
+	// Node.js backend, no gRPC/GraphQL, no AWS and no Prometheus to claim.
+	var all []string
+	for _, g := range stack {
+		all = append(all, g.Items...)
+	}
+	joined := strings.Join(all, " ")
+	for _, forbidden := range []string{"Node", "gRPC", "GraphQL", "AWS", "Prometheus", "Jaeger", "Temporal"} {
+		if strings.Contains(joined, forbidden) {
+			t.Errorf("stack claims %q, which is not on the CV", forbidden)
+		}
+	}
+}
+
+func TestFocusAreasCoverTheCV(t *testing.T) {
+	if len(focusAreas) < 3 {
+		t.Fatalf("expected at least three focus areas, got %d", len(focusAreas))
+	}
+	for _, f := range focusAreas {
+		if f.Title == "" || f.Body == "" {
+			t.Errorf("focus area has empty fields: %+v", f)
+		}
+		if f.Hue < 0 || f.Hue > 359 {
+			t.Errorf("focus area %q has hue %d outside the dawn spectrum", f.Title, f.Hue)
+		}
+	}
+
+	joined := strings.ToLower(focusAreas[0].Body)
+	for _, f := range focusAreas[1:] {
+		joined += " " + strings.ToLower(f.Body)
+	}
+	// "thousands of requests per minute" is the confirmed figure; per second
+	// would be an inflation of it.
+	if strings.Contains(joined, "requests per second") {
+		t.Error("focus areas inflate the throughput figure to per second")
 	}
 }
 
@@ -172,8 +228,10 @@ func TestLinksValid(t *testing.T) {
 					t.Fatal("empty label")
 				}
 				if link.Href == "" {
-					if group != "courses" {
-						t.Errorf("empty href only allowed for education items, got group %q", group)
+					// Education entries have no diploma to link, and the
+					// location line in Contact is a fact, not a destination.
+					if group != "courses" && group != "contact" {
+						t.Errorf("empty href only allowed for education and contact facts, got group %q", group)
 					}
 					return
 				}

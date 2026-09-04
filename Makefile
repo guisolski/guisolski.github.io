@@ -9,7 +9,7 @@ LDFLAGS   := -trimpath -ldflags="-s -w"
 WASM_OUT  := web/app.wasm
 DIST      := dist
 
-.PHONY: help test wasm serve dist opt clean
+.PHONY: help test wasm serve dist og opt clean
 
 help: ## Show this help
 	@echo "Usage: make <target>"
@@ -34,6 +34,9 @@ dist: test ## Build the production static site into dist/
 	cp -r assets $(DIST)/assets
 	cp -r static/. $(DIST)/
 	cp $(DIST)/index.html $(DIST)/404.html
+
+og: ## Regenerate the share card at assets/images/og.png (requires Pillow)
+	python3 scripts/og.py
 
 opt: ## Shrink web/app.wasm with wasm-opt (requires binaryen)
 	wasm-opt -Oz --enable-bulk-memory --enable-sign-ext \

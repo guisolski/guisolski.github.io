@@ -4,8 +4,11 @@ My personal CV — https://guisolski.github.io
 
 Written in **Go**, compiled to **WebAssembly** with
 [go-app](https://github.com/maxence-charriere/go-app). No JavaScript
-frameworks, no external requests: the whole UI (reactive career timeline,
-cards, and a hidden canvas night scene) runs as a Go program in the browser.
+frameworks, no external requests: the whole UI (interactive career rail, focus
+areas, cards, and a hidden canvas night scene) runs as a Go program in the
+browser. The machine-readable layer — prerendered HTML with `<time datetime>`
+milestones, schema.org JSON-LD, `llms.txt`, `sitemap.xml` — is generated from
+the same `content.go` the page renders from.
 
 English CV download: [`assets/pdf/cv.pdf`](assets/pdf/cv.pdf) (moderncv).
 `assets/pdf/resume.pdf` is kept as an identical copy so older bookmarks still
@@ -24,10 +27,11 @@ Deployment is automated: every push to `master` runs
 `.github/workflows/deploy.yml`, which builds the WASM binary, generates the
 static site with prerendered HTML, and publishes it to GitHub Pages.
 
-Files under `static/` (for example `robots.txt` and `llms.txt`) are copied to
-the site root by `make dist`, so they are served at
-`https://guisolski.github.io/robots.txt` and
-`https://guisolski.github.io/llms.txt` after deploy.
+Files under `static/` (for example `robots.txt`) are copied to the site root by
+`make dist`. `llms.txt` and `sitemap.xml` are not files at all — they are
+generated from `content.go` at build time by `llms.go`, so there is no second
+copy of the career facts to drift out of date. `make og` regenerates the
+1200x630 share card at `assets/images/og.png`.
 
 ## Design notes
 
@@ -52,9 +56,29 @@ the site root by `make dist`, so they are served at
   most recent entry so the current role reads first and the dawn line arrives
   fully revealed; it runs before the first render on both prerender and
   in-browser (go-app lifecycle).
-- **Timeline keeps the active date in view (`timeline.go`)**: after a
-  selection change, `move` defers a scroll-into-view of the active date dot so
-  it stays visible when the rail overflows on narrow screens.
+- **Timeline keeps the active date in view (`timeline.go`)**: the rail
+  overflows on narrow screens, so `centerActiveDate` scrolls the rail itself by
+  the active dot's offset. `scrollIntoView` walks every scrollable ancestor and
+  settles short of the mark; and the initial centring is `"instant"`, because a
+  smooth ten-year glide on mount is both unasked-for and, under a stalled
+  compositor, liable never to land.
+- **Timeline renders differently on the server (`timeline.go`)**: the rail shows
+  one milestone at a time, which would ship fourteen of fifteen panels as
+  `aria-hidden` to anything that only reads the HTML. Under `app.IsServer` the
+  component renders the whole career as an `<ol>` of `<article>`s with
+  `<time datetime>`, and WASM swaps in the rail once it boots. go-app replaces
+  the body wholesale on load, so the two forms need not match.
+- **Repeated years are unlabelled (`timeline.go`)**: `showsYear` blanks the year
+  under the second and later dots of the same year, so the rail reads as a run
+  of years rather than "2022 2022 2022 2022". Every dot stays.
+- **Structured data mirrors the page (`jsonld.go`)**: the schema.org
+  `ProfilePage`/`Person` block is built from the same constants the page
+  renders. `json.Marshal` escapes `<`, `>` and `&`, so the payload cannot close
+  the `<script>` element it is injected into.
+- **`Domain` and `Icon` on the handler (`main.go`)**: without `Domain`, go-app
+  emits `og:url` and `og:image` as the literal string `https://`; without
+  `Icon.SVG`, the favicon is fetched from `raw.githubusercontent.com` — which
+  is both the wrong logo and the site's only external request.
 - **Timeline event-panel slide direction (`timeline.go`)**: the selected panel
   animates in from the side it was approached from.
 - **Inline SVG icons (`cards.go`)**: icons render as inline `<svg>` markup
@@ -66,6 +90,14 @@ the site root by `make dist`, so they are served at
   is expected to remain chronologically ordered (enforced by
   `TestTimelineEntriesChronological`); add new milestones as one-line appends
   at the end.
-- **`entryTime` test helper (`content_test.go`)**: bare-year dates (`"2023"`)
+- **`entryTime` test helper (`content_test.go`)**: bare-year dates (`"2024"`)
   are treated as sorting at the end of that year, so they don't spuriously
   sort before same-year entries that include a month.
+- **Colour is information, not decoration (`web/app.css`)**: hue always encodes
+  a position in time. The career rail walks the dawn spectrum from night indigo
+  (2015) to star amber (2025), and the focus areas and cards below take their
+  stop from the same walk, so scrolling the page warms it the way scrubbing the
+  rail does. Nothing is tinted for its own sake.
+- **Dot contrast (`web/app.css`)**: the rail dot's border carries the contrast
+  (>=3.5:1 at every hue) and its fill carries the colour, so the bright amber
+  the design wants stays a legible UI component.
