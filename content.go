@@ -148,7 +148,7 @@ const (
 	personTimezone        = "UTC−3"
 	personTagline         = "Backend engineer writing Go at Mercado Libre. Part-time co-founder of FINK AI."
 	siteURL               = "https://guisolski.github.io"
-	profileImage          = "/assets/images/profile.png"
+	profileImage          = "/assets/images/profile.jpg"
 	availability          = "Open to full-time backend roles"
 	availabilityQualifier = "Remote or relocation"
 )

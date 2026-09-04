@@ -40,6 +40,33 @@ func TestStaticRobotsTxt(t *testing.T) {
 	}
 }
 
+// A JPEG served as .png is the kind of thing that renders fine in a browser
+// (which sniffs) and is rejected by the scrapers that read the JSON-LD image.
+func TestProfileImageMatchesItsExtension(t *testing.T) {
+	path := filepath.Join(staticRoot(t), "..", strings.TrimPrefix(profileImage, "/"))
+	data, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("%s missing: %v", profileImage, err)
+	}
+	if len(data) < 2000 {
+		t.Errorf("%s looks too small (%d bytes) to be a portrait", profileImage, len(data))
+	}
+
+	magic := map[string]string{
+		".jpg":  "\xff\xd8\xff",
+		".jpeg": "\xff\xd8\xff",
+		".png":  "\x89PNG",
+	}
+	ext := filepath.Ext(profileImage)
+	want, ok := magic[ext]
+	if !ok {
+		t.Fatalf("unhandled portrait extension %q", ext)
+	}
+	if !strings.HasPrefix(string(data), want) {
+		t.Errorf("%s is not a %s: header %x", profileImage, ext, data[:4])
+	}
+}
+
 func TestResumePDFAssetsExist(t *testing.T) {
 	for _, rel := range []string{
 		"assets/pdf/cv.pdf",
