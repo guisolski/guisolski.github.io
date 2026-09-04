@@ -11,7 +11,7 @@ Guilherme Solski Alves is a backend engineer with 7+ years in production systems
 - Site: https://guisolski.github.io/
 - LinkedIn: https://www.linkedin.com/in/guilherme-solski-alves/
 - GitHub: https://github.com/guisolski
-- Résumé (English PDF): https://guisolski.github.io/assets/pdf/resume.pdf
+- CV (English, PDF): https://guisolski.github.io/assets/pdf/cv.pdf
 - Currículo (Portuguese PDF): https://guisolski.github.io/assets/pdf/Curriculum/portugues.pdf
 
 ## Contact

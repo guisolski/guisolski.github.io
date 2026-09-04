@@ -130,11 +130,11 @@ var courseLinks = []Link{
 }
 
 var resumeLinks = []Link{
-	{Label: "Résumé (English, PDF)", Href: "/assets/pdf/resume.pdf", Icon: "file"},
+	{Label: "CV (English, PDF)", Href: "/assets/pdf/cv.pdf", Icon: "file"},
 	{Label: "Currículo (Português, PDF)", Href: "/assets/pdf/Curriculum/portugues.pdf", Icon: "file"},
 }
 
-// resumeLink is kept for callers/tests that expect the English résumé path.
+// resumeLink is kept for callers/tests that expect the English CV path.
 var resumeLink = resumeLinks[0]
 
 type Tagged struct {

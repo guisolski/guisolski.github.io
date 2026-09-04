@@ -46,7 +46,8 @@ func TestStaticLLMsTxt(t *testing.T) {
 		"https://guisolski.github.io/",
 		"https://www.linkedin.com/in/guilherme-solski-alves/",
 		"https://github.com/guisolski",
-		"/assets/pdf/resume.pdf",
+		"/assets/pdf/cv.pdf",
+		"CV (English, PDF)",
 		"guilhermesolskialves@gmail.com",
 	} {
 		if !strings.Contains(body, want) {
@@ -57,7 +58,8 @@ func TestStaticLLMsTxt(t *testing.T) {
 
 func TestResumePDFAssetsExist(t *testing.T) {
 	for _, rel := range []string{
-		"assets/pdf/resume.pdf",
+		"assets/pdf/cv.pdf",
+		"assets/pdf/resume.pdf", // kept identical so old bookmarks do not 404
 		"assets/pdf/Curriculum/portugues.pdf",
 	} {
 		path := filepath.Join(staticRoot(t), "..", rel)
@@ -69,5 +71,17 @@ func TestResumePDFAssetsExist(t *testing.T) {
 		if info.Size() < 1000 {
 			t.Errorf("%s looks too small (%d bytes)", rel, info.Size())
 		}
+	}
+
+	cv, err := os.ReadFile(filepath.Join(staticRoot(t), "..", "assets/pdf/cv.pdf"))
+	if err != nil {
+		t.Fatalf("cv.pdf: %v", err)
+	}
+	resume, err := os.ReadFile(filepath.Join(staticRoot(t), "..", "assets/pdf/resume.pdf"))
+	if err != nil {
+		t.Fatalf("resume.pdf: %v", err)
+	}
+	if string(cv) != string(resume) {
+		t.Error("assets/pdf/resume.pdf must stay identical to assets/pdf/cv.pdf for old bookmarks")
 	}
 }
