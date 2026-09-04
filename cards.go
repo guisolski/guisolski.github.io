@@ -34,8 +34,7 @@ func courseLinksBody() []app.UI {
 
 func resumeBody() []app.UI {
 	return []app.UI{
-		linkList([]Link{resumeLink}),
-		app.P().Class("card__note").Text("Ask me for a Portuguese version by email."),
+		linkList(resumeLinks),
 	}
 }
 
@@ -90,6 +89,14 @@ type linkRenderer struct {
 
 func (r linkRenderer) render(i int) app.UI {
 	l := r.links[i]
+	if l.Href == "" {
+		return app.Li().Body(
+			app.Span().Class("links__item links__item--plain").Body(
+				icon(l.Icon),
+				app.Span().Text(l.Label),
+			),
+		)
+	}
 	a := app.A().Class("links__item").Href(l.Href).Body(
 		icon(l.Icon),
 		app.Span().Text(l.Label),

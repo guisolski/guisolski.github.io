@@ -657,6 +657,25 @@ body {
   overflow-wrap: anywhere;
 }
 
+.links__item--plain {
+  cursor: default;
+}
+
+.links__item--plain span {
+  background: none;
+}
+
+.links__item--plain:hover,
+.links__item--plain:focus-visible {
+  color: var(--ink);
+}
+
+.links__item--plain:hover .icon,
+.links__item--plain:focus-visible .icon {
+  transform: none;
+  color: hsl(var(--card-h, 245) 55% 48%);
+}
+
 .links__item .icon {
   flex-shrink: 0;
   color: hsl(var(--card-h, 245) 55% 48%);

@@ -1,0 +1,3 @@
+# https://guisolski.github.io/
+User-agent: *
+Allow: /
