@@ -61,10 +61,18 @@ func serveServiceWorker(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "static/service-worker.js")
 }
 
+func serveStaticRootFile(name string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "static/"+name)
+	}
+}
+
 func newDevMux(h *app.Handler) *http.ServeMux {
 	mux := http.NewServeMux()
 	mux.Handle("/assets/", http.FileServer(http.Dir(".")))
 	mux.HandleFunc("/service-worker.js", serveServiceWorker)
+	mux.HandleFunc("/robots.txt", serveStaticRootFile("robots.txt"))
+	mux.HandleFunc("/llms.txt", serveStaticRootFile("llms.txt"))
 	mux.Handle("/", h)
 	return mux
 }
